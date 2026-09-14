@@ -1,0 +1,14 @@
+{
+  "year": 2025,
+  "stage": "past",
+  "paymentMethod": "school-payment",
+  "beneficiary": {
+    "name": "Homeless Youth Connection",
+    "confirmed": true,
+    "inKindDonation": true
+  },
+  "theme": {
+    "name": "Around the World"
+  },
+  "sponsors": []
+}

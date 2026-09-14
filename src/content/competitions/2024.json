@@ -1,0 +1,13 @@
+{
+  "year": 2024,
+  "stage": "past",
+  "paymentMethod": "direct-donation",
+  "beneficiary": {
+    "name": "Homeless Youth Connection",
+    "confirmed": true
+  },
+  "theme": {
+    "name": "Chompers and Thompers"
+  },
+  "sponsors": []
+}

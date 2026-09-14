@@ -1,0 +1,233 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  // A Math Competition's Theme colour, layered on top of the club's light blue.
+  accent?: string;
+}
+
+const { title, description = 'Route to Success, a student club at BASIS Chandler.', accent } = Astro.props;
+
+const nav = [
+  { href: '/math-competition', label: 'Math Competition' },
+  { href: '/events', label: 'Events' },
+  { href: '/about', label: 'About' },
+  { href: '/sponsors', label: 'Sponsors' },
+  { href: '/volunteer', label: 'Volunteer' },
+  { href: '/contact', label: 'Contact' },
+];
+
+const footer = [
+  {
+    heading: 'Math Competition',
+    links: [
+      { href: '/math-competition#register', label: 'Register' },
+      { href: '/math-competition#rounds-and-divisions', label: 'Rounds & Divisions' },
+      { href: '/math-competition#sample-questions', label: 'Sample Questions' },
+      { href: '/math-competition#faq', label: 'FAQ' },
+      { href: '/math-competition/past', label: 'Past Competitions' },
+    ],
+  },
+  {
+    heading: 'Club',
+    links: [
+      { href: '/about', label: 'About' },
+      { href: '/volunteer', label: 'Volunteer' },
+      { href: '/contact', label: 'Contact' },
+    ],
+  },
+  {
+    heading: 'Support',
+    links: [
+      { href: '/sponsors', label: 'Sponsors' },
+      { href: '/sponsors#prospectus', label: 'Prospectus' },
+    ],
+  },
+];
+
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <!-- The star from the club logo, in club blue. -->
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <title>{title === 'Route to Success' ? title : `${title} | Route to Success`}</title>
+  </head>
+  <body style={accent ? `--accent: ${accent}` : undefined}>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="/">
+          <img src="/logo.jpg" alt="Route to Success" width="554" height="302" />
+        </a>
+        <nav aria-label="Main">
+          <ul>
+            {
+              nav.map((item) => (
+                <li>
+                  <a href={item.href} aria-current={currentPath.startsWith(item.href) ? 'page' : undefined}>
+                    {item.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        {
+          footer.map((group) => (
+            <section>
+              <h2>{group.heading}</h2>
+              <ul>
+                {group.links.map((link) => (
+                  <li>
+                    <a href={link.href}>{link.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
+      </div>
+      <p class="container fine-print">Route to Success is a student club at BASIS Chandler.</p>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    /* Club blue, taken from the club logo. Keep text on it dark: white text doesn't have enough contrast. */
+    --club-blue: #5a9bd5;
+    --club-blue-soft: #ebf3fa;
+    --ink: #0b2e4a;
+    --ink-muted: #3d5a70;
+    --paper: #ffffff;
+    --accent: var(--club-blue);
+    --radius: 0.75rem;
+
+    color-scheme: light;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--paper);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 64rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  main.container {
+    padding-block: 2rem 3rem;
+  }
+</style>
+
+<style>
+  .site-header {
+    background: var(--club-blue);
+  }
+
+  .header-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    padding-block: 0.75rem;
+  }
+
+  .brand {
+    display: block;
+    line-height: 0;
+  }
+
+  .brand img {
+    height: 3.5rem;
+    width: auto;
+    /* The logo is black on a white background; multiply lets the header's blue show through the white. */
+    mix-blend-mode: multiply;
+  }
+
+  nav ul,
+  .site-footer ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+  }
+
+  nav a {
+    text-decoration: none;
+    padding-block: 0.25rem;
+  }
+
+  nav a:hover,
+  nav a[aria-current='page'] {
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
+  }
+
+  .site-footer {
+    background: var(--club-blue-soft);
+    padding-block: 2rem 1rem;
+    color: var(--ink-muted);
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 1.5rem;
+  }
+
+  .site-footer h2 {
+    font-size: 1rem;
+    color: var(--ink);
+    margin: 0 0 0.5rem;
+  }
+
+  .site-footer li {
+    margin-block: 0.25rem;
+  }
+
+  .fine-print {
+    margin-top: 2rem;
+    font-size: 0.875rem;
+  }
+</style>
