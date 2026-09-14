@@ -1,0 +1,128 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// The current Math Competition is the newest one that isn't Past yet.
+const competitions = await getCollection('competitions');
+const current = competitions
+  .map((entry) => entry.data)
+  .filter((competition) => competition.stage !== 'past')
+  .sort((a, b) => b.year - a.year)[0];
+
+// Dates are stored without a time, so format them in UTC to avoid showing the day before in Arizona.
+const formatDate = (date: Date) =>
+  date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+
+// Don't name the Beneficiary until the Club Adviser and the Beneficiary have agreed.
+const beneficiaryText = current?.beneficiary
+  ? current.beneficiary.confirmed
+    ? current.beneficiary.name
+    : 'a local youth charity'
+  : undefined;
+---
+
+<BaseLayout title="Route to Success" accent={current?.theme.color}>
+  <section class="hero">
+    <p class="eyebrow">A student club at BASIS Chandler</p>
+    <h1>Route to Success</h1>
+    <p class="lead">We run a yearly Math Competition for students, and take part in events across our school community.</p>
+  </section>
+
+  {
+    current && (
+      <section class="competition" aria-labelledby="competition-heading">
+        <h2 id="competition-heading">{current.year} Math Competition</h2>
+        {current.theme.name && <p class="theme">Theme: {current.theme.name}</p>}
+        {current.date && <p class="date">{formatDate(current.date)}</p>}
+        {current.location && <p>{current.location}</p>}
+
+        {current.stage === 'upcoming' && current.registration && (
+          <p>Registration opens {formatDate(current.registration.opens)}.</p>
+        )}
+
+        {current.stage === 'registration-open' && current.registration && (
+          <>
+            <p>Registration is open until {formatDate(current.registration.closes)}.</p>
+            {current.registration.formUrl && (
+              <a class="button" href={current.registration.formUrl}>
+                Register now
+              </a>
+            )}
+          </>
+        )}
+
+        {current.stage === 'registration-closed' && (
+          <p>
+            Online registration is closed.
+            {current.walkIns && current.date && ` Walk-ins are welcome on ${formatDate(current.date)}.`}
+          </p>
+        )}
+
+        {beneficiaryText && <p>Entry Fees support {beneficiaryText}.</p>}
+
+        <a class="more" href="/math-competition">
+          About the Math Competition
+        </a>
+      </section>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-block: 1rem 2rem;
+  }
+
+  .eyebrow {
+    margin: 0;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 8vw, 3.5rem);
+    line-height: 1.1;
+    margin: 0.25rem 0 1rem;
+  }
+
+  .lead {
+    font-size: 1.125rem;
+    max-width: 40rem;
+  }
+
+  .competition {
+    background: var(--club-blue-soft);
+    border-top: 0.5rem solid var(--accent);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+
+  .competition h2 {
+    margin-top: 0;
+  }
+
+  .date {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .theme {
+    color: var(--ink-muted);
+  }
+
+  .button {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .more {
+    display: inline-block;
+    margin-top: 0.5rem;
+    font-weight: 600;
+  }
+</style>
