@@ -3,7 +3,6 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import ComingSoon from '../../components/ComingSoon.astro';
 import ThemeArtwork from '../../components/themes/ThemeArtwork.astro';
-import PlaceholderTag from '../../components/PlaceholderTag.astro';
 import { countWord, formatDate, getCurrentCompetition, ordinal, registrationOpenText, registrationOpensText } from '../../lib/competitions';
 
 const current = await getCurrentCompetition();
@@ -94,7 +93,6 @@ const mapUrl = current?.location
     <p class="intro lead">
       Every year, Route to Success runs a Math Competition for students. Competitors solve problems across four Rounds,
       grouped into Divisions by grade.
-      <PlaceholderTag />
     </p>
 
     <!-- The footer links to each of these sections by its id. -->
@@ -140,7 +138,7 @@ const mapUrl = current?.location
         <div class="card">
           <h3>{countWord(divisions.length)} Divisions</h3>
           <p>
-            Competitors are grouped by grade, so everyone competes against students of a similar age. <PlaceholderTag />
+            Competitors are grouped by grade, so everyone competes against students of a similar age.
             {current?.grades && ` This year is open to ${current.grades.toLowerCase()}.`}
           </p>
           <ul class="chips">

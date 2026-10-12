@@ -1,0 +1,247 @@
+---
+// The club's route so far: a dot for our first Math Competition, a stop for each year we have a data file for,
+// and the star for the next one. Reads the Math Competition data files, so a new year appears on its own.
+import { getCollection } from 'astro:content';
+
+interface Props {
+  // The year of the Math Competition that hasn't happened yet, if there is one.
+  nextYear?: number;
+  // e.g. "Saturday, November 21", shown under the star.
+  nextDate?: string;
+}
+
+const { nextYear, nextDate } = Astro.props;
+
+const competitions = (await getCollection('competitions'))
+  .map((entry) => entry.data)
+  .sort((a, b) => a.year - b.year);
+
+const past = competitions.filter((competition) => competition.year !== nextYear);
+const next = competitions.find((competition) => competition.year === nextYear);
+
+// The newest Math Competition that knows its number (e.g. the 7th) tells us how many came before the
+// years we have data files for. Those show as one gap in the route, so it doesn't look shorter than it is.
+const numbered = [...competitions].reverse().find((competition) => competition.edition);
+const shownBefore = numbered ? competitions.filter((competition) => competition.year <= numbered.year).length : 0;
+const missing = numbered?.edition ? numbered.edition - 1 - shownBefore : 0;
+
+// Don't name the Beneficiary until the Club Adviser and the Beneficiary have agreed.
+const supported = (competition: (typeof competitions)[number]) =>
+  competition.beneficiary?.confirmed ? `Supported ${competition.beneficiary.name}` : undefined;
+---
+
+<ol class="route-timeline">
+  <li class="stop start">
+    <span class="marker" aria-hidden="true"></span>
+    <p class="stop-year">Where it started</p>
+    <p class="stop-theme">Our 1st Math Competition</p>
+  </li>
+
+  {
+    missing > 0 && (
+      <li class="stop gap">
+        <span class="marker" aria-hidden="true" />
+        <p class="stop-year">
+          <span aria-hidden="true">…</span>
+        </p>
+        <p class="stop-theme">
+          {missing} more Math Competition{missing === 1 ? '' : 's'}
+        </p>
+      </li>
+    )
+  }
+
+  {
+    past.map((competition) => (
+      <li class="stop">
+        <span class="marker" aria-hidden="true" />
+        <p class="stop-year">{competition.year}</p>
+        {competition.theme.name && <p class="stop-theme">{competition.theme.name}</p>}
+        {supported(competition) && <p class="stop-note">{supported(competition)}</p>}
+      </li>
+    ))
+  }
+
+  <li class="stop next">
+    <svg class="marker" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M12 0C13 8 16 11 24 12 16 13 13 16 12 24 11 16 8 13 0 12 8 11 11 8 12 0Z" />
+    </svg>
+    {
+      next ? (
+        <>
+          <p class="stop-year">
+            {next.year} <span class="tag">Coming up</span>
+          </p>
+          {next.theme.name && <p class="stop-theme">{next.theme.name}</p>}
+          {nextDate && <p class="stop-note">{nextDate}</p>}
+        </>
+      ) : (
+        <>
+          <p class="stop-year">Next stop</p>
+          <p class="stop-theme">Our next Math Competition</p>
+          <p class="stop-note">Date to be announced</p>
+        </>
+      )
+    }
+  </li>
+</ol>
+
+<style>
+  .route-timeline {
+    --marker: 1.5rem;
+    --star: 3rem;
+    /* Round ink dots, like the dotted route on the home page drawing. */
+    --dots: radial-gradient(circle, var(--ink) 0.19rem, transparent 0.22rem);
+
+    position: relative;
+    display: grid;
+    gap: 2rem;
+    margin: 0;
+    padding: 0 0 0 calc(var(--star) + 1rem);
+    list-style: none;
+  }
+
+  /* The route itself, drawn from each stop to the next so it ends at the star.
+     On phones it's a column of dots marching down. */
+  .stop:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: calc(var(--marker) / 2);
+    left: calc(-1 * (var(--star) + 1rem) + var(--star) / 2 - 0.4rem);
+    z-index: -1;
+    width: 0.8rem;
+    height: calc(100% + 2rem);
+    background: var(--dots) 0 0 / 0.8rem 0.9rem repeat-y;
+    animation: march-down 1.5s linear infinite;
+  }
+
+  @keyframes march-down {
+    to {
+      background-position: 0 0.9rem;
+    }
+  }
+
+  .stop {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .marker {
+    position: absolute;
+    top: 0;
+    left: calc(-1 * (var(--star) + 1rem) + (var(--star) - var(--marker)) / 2);
+    width: var(--marker);
+    height: var(--marker);
+    border: 3px solid var(--ink);
+    border-radius: 50%;
+    background: var(--paper);
+  }
+
+  .start .marker {
+    background: var(--club-blue);
+  }
+
+  /* The years we don't have stops for yet: a dashed, empty stop. */
+  .gap .marker {
+    border-style: dashed;
+  }
+
+  .gap .stop-theme {
+    font-weight: 600;
+    color: var(--ink-muted);
+  }
+
+  /* The star you're heading for: the club's four-pointed star, in highlighter yellow with an ink outline. */
+  .next .marker {
+    top: calc((var(--marker) - var(--star)) / 2);
+    left: calc(-1 * (var(--star) + 1rem));
+    width: var(--star);
+    height: var(--star);
+    border: 0;
+    border-radius: 0;
+    background: none;
+    overflow: visible;
+    animation: twinkle 3s ease-in-out infinite;
+  }
+
+  .next .marker path {
+    fill: var(--sun);
+    stroke: var(--ink);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+  }
+
+  @keyframes twinkle {
+    50% {
+      transform: scale(1.12) rotate(8deg);
+    }
+  }
+
+  .stop p {
+    margin: 0;
+  }
+
+  .stop-year {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 800;
+    line-height: var(--marker);
+  }
+
+  .stop-theme {
+    font-weight: 700;
+  }
+
+  .stop-note {
+    color: var(--ink-muted);
+  }
+
+  .tag {
+    padding: 0 0.6rem;
+    border-radius: 999px;
+    background: var(--sun);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.6;
+  }
+
+  /* On wider screens the route runs left to right, with each stop's words underneath. */
+  @media (min-width: 52rem) {
+    .route-timeline {
+      grid-auto-columns: 1fr;
+      grid-auto-flow: column;
+      gap: 1.5rem;
+      padding: calc((var(--star) - var(--marker)) / 2 + var(--marker) + 1rem) 0 0;
+    }
+
+    .stop:not(:last-child)::after {
+      top: calc(-1 * (var(--marker) / 2 + 1rem) - 0.4rem);
+      left: calc(var(--marker) / 2);
+      width: calc(100% + 1.5rem);
+      height: 0.8rem;
+      background: var(--dots) 0 0 / 0.9rem 0.8rem repeat-x;
+      animation-name: march-across;
+    }
+
+    @keyframes march-across {
+      to {
+        background-position: 0.9rem 0;
+      }
+    }
+
+    .marker {
+      top: calc(-1 * (var(--marker) + 1rem));
+      left: 0;
+    }
+
+    .next .marker {
+      top: calc(-1 * ((var(--star) - var(--marker)) / 2 + var(--marker) + 1rem));
+      left: 0;
+    }
+  }
+</style>

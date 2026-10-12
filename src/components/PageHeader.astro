@@ -1,17 +1,14 @@
 ---
 // The graph-paper banner at the top of every page except the home page.
 import Sparkle from './Sparkle.astro';
-import PlaceholderTag from './PlaceholderTag.astro';
 
 interface Props {
   title: string;
   eyebrow?: string;
   lead?: string;
-  // True when the lead is wording Claude drafted that the club hasn't approved yet.
-  leadIsPlaceholder?: boolean;
 }
 
-const { title, eyebrow, lead, leadIsPlaceholder = false } = Astro.props;
+const { title, eyebrow, lead } = Astro.props;
 ---
 
 <header class="page-header graph-paper">
@@ -21,14 +18,7 @@ const { title, eyebrow, lead, leadIsPlaceholder = false } = Astro.props;
       {title}
       <Sparkle class="header-sparkle" size="0.6em" />
     </h1>
-    {
-      lead && (
-        <p class="lead">
-          {lead}
-          {leadIsPlaceholder && <PlaceholderTag />}
-        </p>
-      )
-    }
+    {lead && <p class="lead">{lead}</p>}
   </div>
 </header>
 

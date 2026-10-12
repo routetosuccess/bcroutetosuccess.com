@@ -1,7 +1,6 @@
 ---
 import { Font } from 'astro:assets';
 import Sparkle from '../components/Sparkle.astro';
-import PlaceholderTag from '../components/PlaceholderTag.astro';
 import { getEvents, smallerEventsId } from '../lib/events';
 
 interface Props {
@@ -121,7 +120,6 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
         <p class="footer-tagline">
           <Sparkle size="1.25rem" />
           Every route starts with a first step.
-          <PlaceholderTag />
         </p>
         <div class="footer-grid">
           {
@@ -142,6 +140,33 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
         <p class="fine-print">Route to Success is a student club at BASIS Chandler.</p>
       </div>
     </footer>
+
+    <script>
+      // The Other Events menu opens on hover or keyboard focus (wide screens only). This tells screen readers
+      // whether it's open, and lets Escape close it and put focus back on its link.
+      document.querySelectorAll<HTMLElement>('.has-menu').forEach((item) => {
+        const link = item.querySelector<HTMLElement>(':scope > a');
+        const menu = item.querySelector<HTMLElement>('.menu');
+        const update = () => link?.setAttribute('aria-expanded', String(menu ? getComputedStyle(menu).display !== 'none' : false));
+        const reopen = () => {
+          delete item.dataset.closed;
+          requestAnimationFrame(update);
+        };
+        update();
+        item.addEventListener('keydown', (event) => {
+          if (event.key !== 'Escape') return;
+          item.dataset.closed = '';
+          link?.focus();
+          update();
+        });
+        item.addEventListener('mouseenter', () => requestAnimationFrame(update));
+        item.addEventListener('focusin', () => requestAnimationFrame(update));
+        item.addEventListener('mouseleave', reopen);
+        item.addEventListener('focusout', (event) => {
+          if (!item.contains(event.relatedTarget as Node | null)) reopen();
+        });
+      });
+    </script>
   </body>
 </html>
 
@@ -391,9 +416,12 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
     gap: 0.25rem;
   }
 
+  /* At least 44px tall, so they're easy to tap. */
   nav a {
-    display: block;
-    padding: 0.35rem 0.8rem;
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0.55rem 0.8rem;
     border-radius: 999px;
     font-weight: 600;
     font-size: 0.9375rem;
@@ -451,6 +479,15 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
       transform: rotate(180deg);
     }
 
+    /* Escape closes it until the pointer or focus leaves (see the script below). */
+    .has-menu[data-closed] .menu {
+      display: none;
+    }
+
+    .has-menu[data-closed] .caret {
+      transform: none;
+    }
+
     .menu {
       position: absolute;
       top: 100%;
@@ -472,6 +509,11 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
       content: '';
       position: absolute;
       inset: -0.75rem 0 100%;
+    }
+
+    /* Inside the menu the focus ring sits within the link, so it doesn't run into the menu's border. */
+    .menu a:focus-visible {
+      outline-offset: -3px;
     }
 
     .menu a {
@@ -516,11 +558,9 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
     margin: 0 0 0.5rem;
   }
 
-  .site-footer li {
-    margin-block: 0.25rem;
-  }
-
   .site-footer a {
+    display: inline-block;
+    padding-block: 0.55rem;
     text-decoration: none;
   }
 

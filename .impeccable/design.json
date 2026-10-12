@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-12T00:00:00Z",
+  "title": "Design System: Route to Success",
+  "extensions": {
+    "colorMeta": {
+      "club-blue": { "role": "primary", "displayName": "Club Blue", "canonical": "#5a9bd5", "tonalRamp": ["oklch(15% 0.04 250)", "oklch(25% 0.07 250)", "oklch(35% 0.09 250)", "oklch(45% 0.11 250)", "oklch(55% 0.11 250)", "oklch(66% 0.11 250)", "oklch(80% 0.07 250)", "oklch(95% 0.02 250)"] },
+      "highlighter-yellow": { "role": "secondary", "displayName": "Highlighter Yellow", "canonical": "#ffcb47", "tonalRamp": ["oklch(15% 0.03 85)", "oklch(25% 0.05 85)", "oklch(35% 0.07 85)", "oklch(45% 0.09 85)", "oklch(55% 0.11 85)", "oklch(70% 0.14 85)", "oklch(86% 0.16 85)", "oklch(95% 0.06 85)"] },
+      "navy-ink": { "role": "neutral", "displayName": "Navy Ink", "canonical": "#0b2e4a", "tonalRamp": ["oklch(15% 0.04 245)", "oklch(25% 0.06 245)", "oklch(29% 0.07 245)", "oklch(45% 0.07 245)", "oklch(55% 0.06 245)", "oklch(65% 0.05 245)", "oklch(80% 0.03 245)", "oklch(95% 0.01 245)"] },
+      "ink-muted": { "role": "neutral", "displayName": "Ink Muted", "canonical": "#3d5a70", "tonalRamp": ["oklch(15% 0.03 240)", "oklch(25% 0.04 240)", "oklch(35% 0.05 240)", "oklch(45% 0.05 240)", "oklch(55% 0.05 240)", "oklch(65% 0.04 240)", "oklch(80% 0.03 240)", "oklch(95% 0.01 240)"] },
+      "club-blue-soft": { "role": "neutral", "displayName": "Club Blue Soft", "canonical": "#ebf3fa", "tonalRamp": ["oklch(15% 0.012 240)", "oklch(25% 0.012 240)", "oklch(35% 0.012 240)", "oklch(45% 0.012 240)", "oklch(55% 0.012 240)", "oklch(65% 0.012 240)", "oklch(80% 0.012 240)", "oklch(96% 0.012 240)"] },
+      "paper": { "role": "neutral", "displayName": "Paper", "canonical": "#ffffff", "tonalRamp": ["oklch(15% 0 0)", "oklch(25% 0 0)", "oklch(35% 0 0)", "oklch(45% 0 0)", "oklch(55% 0 0)", "oklch(65% 0 0)", "oklch(80% 0 0)", "oklch(100% 0 0)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Page titles (h1) in the hero and page headers." },
+      "headline": { "displayName": "Headline", "purpose": "Section headings (h2)." },
+      "title": { "displayName": "Title", "purpose": "Card headings (h3)." },
+      "lead": { "displayName": "Lead", "purpose": "The intro sentence under a page title, max 38rem wide." },
+      "body": { "displayName": "Body", "purpose": "All running text, with lining numbers." },
+      "label": { "displayName": "Eyebrow", "purpose": "Uppercase label above a section heading, in Ink Muted." }
+    },
+    "shadows": [
+      { "name": "sticker", "value": "0 0.25rem 0 var(--ink)", "purpose": "Cards, secondary buttons and the dropdown menu at rest." },
+      { "name": "sticker-lifted", "value": "0 0.375rem 0 var(--ink)", "purpose": "Secondary button hover, with a 2px rise." },
+      { "name": "card-lifted", "value": "0 0.45rem 0 var(--ink)", "purpose": "Linked card hover, with a 3px rise." },
+      { "name": "blue-sticker", "value": "0 0.25rem 0 var(--club-blue)", "purpose": "Primary buttons at rest; 0.375rem on hover, 0.125rem when pressed." },
+      { "name": "ink-text-shadow", "value": "0.05em 0.05em 0 var(--ink)", "purpose": "White headings on Theme artwork." }
+    ],
+    "motion": [
+      { "name": "press", "value": "0.15s ease", "purpose": "Transform, shadow and background transitions on buttons, cards, nav links and the caret." },
+      { "name": "route-march", "value": "1.5s linear infinite", "purpose": "The dotted route marching along in the home hero." },
+      { "name": "star-twinkle", "value": "3s ease-in-out infinite", "purpose": "The star at the end of the route gently scaling and turning." },
+      { "name": "reduced-motion", "value": "animation: none; transition: none", "purpose": "Applied to everything under prefers-reduced-motion: reduce." }
+    ],
+    "breakpoints": [
+      { "name": "two-column-cards", "value": "44rem" },
+      { "name": "wide", "value": "52rem" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The main action on a page, such as the Math Competition or Register now.",
+      "html": "<a class=\"ds-button\" href=\"#\">2026 Math Competition <span aria-hidden=\"true\">→</span></a>",
+      "css": ".ds-button { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.4rem; border: 2px solid var(--ink, #0b2e4a); border-radius: 999px; background: var(--ink, #0b2e4a); color: var(--paper, #fff); font-family: var(--font-body, Raleway, system-ui, sans-serif); font-weight: 700; text-decoration: none; box-shadow: 0 0.25rem 0 var(--club-blue, #5a9bd5); transition: transform 0.15s ease, box-shadow 0.15s ease; } .ds-button:hover { transform: translateY(-2px); box-shadow: 0 0.375rem 0 var(--club-blue, #5a9bd5); } .ds-button:active { transform: translateY(2px); box-shadow: 0 0.125rem 0 var(--club-blue, #5a9bd5); } .ds-button:focus-visible { outline: 3px solid var(--ink, #0b2e4a); outline-offset: 3px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "A second action beside a primary one, such as Become a Sponsor.",
+      "html": "<a class=\"ds-button-secondary\" href=\"#\">Become a Sponsor</a>",
+      "css": ".ds-button-secondary { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.4rem; border: 2px solid var(--ink, #0b2e4a); border-radius: 999px; background: var(--paper, #fff); color: var(--ink, #0b2e4a); font-family: var(--font-body, Raleway, system-ui, sans-serif); font-weight: 700; text-decoration: none; box-shadow: 0 0.25rem 0 var(--ink, #0b2e4a); transition: transform 0.15s ease, box-shadow 0.15s ease; } .ds-button-secondary:hover { transform: translateY(-2px); box-shadow: 0 0.375rem 0 var(--ink, #0b2e4a); } .ds-button-secondary:active { transform: translateY(2px); box-shadow: 0 0.125rem 0 var(--ink, #0b2e4a); } .ds-button-secondary:focus-visible { outline: 3px solid var(--ink, #0b2e4a); outline-offset: 3px; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "The inked sticker container for facts, Events and competition details; linked cards lift on hover.",
+      "html": "<a class=\"ds-card\" href=\"#\"><svg class=\"ds-sparkle\" viewBox=\"0 0 24 24\" width=\"32\" height=\"32\" aria-hidden=\"true\"><path d=\"M12 0C13 8 16 11 24 12 16 13 13 16 12 24 11 16 8 13 0 12 8 11 11 8 12 0Z\" fill=\"currentColor\"/></svg><h3>Sponsor the Math Competition</h3><p>Support the club and get recognised by the families who take part.</p><span class=\"ds-card-link\">Become a Sponsor <span aria-hidden=\"true\">→</span></span></a>",
+      "css": ".ds-card { display: flex; flex-direction: column; gap: 0.5rem; max-width: 22rem; padding: 1.5rem; background: var(--paper, #fff); color: var(--ink, #0b2e4a); border: 2px solid var(--ink, #0b2e4a); border-radius: 1rem; box-shadow: 0 0.25rem 0 var(--ink, #0b2e4a); font-family: var(--font-body, Raleway, system-ui, sans-serif); text-decoration: none; transition: transform 0.15s ease, box-shadow 0.15s ease; } .ds-card:hover { transform: translateY(-3px); box-shadow: 0 0.45rem 0 var(--ink, #0b2e4a); } .ds-card:focus-visible { outline: 3px solid var(--ink, #0b2e4a); outline-offset: 3px; } .ds-card h3 { margin: 0; font-size: 1.25rem; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; } .ds-card p { margin: 0; line-height: 1.6; } .ds-sparkle { color: var(--club-blue, #5a9bd5); } .ds-card-link { margin-top: auto; padding-top: 0.75rem; font-weight: 700; text-decoration: underline; text-underline-offset: 0.2em; }"
+    },
+    {
+      "name": "Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Lists of Rounds and Divisions.",
+      "html": "<ul class=\"ds-chips\"><li>Sprint</li><li>Target</li><li>Division 1<span class=\"ds-chip-detail\"> · Grades 1–2</span></li></ul>",
+      "css": ".ds-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; list-style: none; font-family: var(--font-body, Raleway, system-ui, sans-serif); color: var(--ink, #0b2e4a); } .ds-chips li { padding: 0.3rem 0.9rem; border: 2px solid var(--ink, #0b2e4a); border-radius: 999px; background: var(--club-blue-soft, #ebf3fa); font-weight: 700; } .ds-chip-detail { font-weight: 500; }"
+    },
+    {
+      "name": "Main Navigation",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Pill-shaped header links; the current page fills Club Blue.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Main\"><a href=\"#\" aria-current=\"page\">Math Competition</a><a href=\"#\">Other Events</a><a href=\"#\">About</a><a href=\"#\">Sponsors</a><a href=\"#\">Contact</a></nav>",
+      "css": ".ds-nav { display: flex; flex-wrap: wrap; gap: 0.25rem; padding: 0.5rem 0; background: var(--paper, #fff); border-bottom: 2px solid var(--ink, #0b2e4a); font-family: var(--font-body, Raleway, system-ui, sans-serif); } .ds-nav a { display: block; padding: 0.35rem 0.8rem; border-radius: 999px; color: var(--ink, #0b2e4a); font-weight: 600; font-size: 0.9375rem; text-decoration: none; transition: background-color 0.15s ease; } .ds-nav a:hover { background: var(--club-blue-soft, #ebf3fa); } .ds-nav a[aria-current='page'] { background: var(--club-blue, #5a9bd5); } .ds-nav a:focus-visible { outline: 3px solid var(--ink, #0b2e4a); outline-offset: 3px; }"
+    },
+    {
+      "name": "Page Header",
+      "kind": "custom",
+      "description": "Graph-paper banner with eyebrow, title, Sparkle and lead at the top of every inner page.",
+      "html": "<header class=\"ds-page-header\"><p class=\"ds-eyebrow\">Support the club</p><h1>Sponsors <svg viewBox=\"0 0 24 24\" width=\"0.6em\" height=\"0.6em\" aria-hidden=\"true\"><path d=\"M12 0C13 8 16 11 24 12 16 13 13 16 12 24 11 16 8 13 0 12 8 11 11 8 12 0Z\" fill=\"currentColor\"/></svg></h1><p class=\"ds-lead\">Sponsors help Route to Success run the Math Competition.</p></header>",
+      "css": ".ds-page-header { padding: 3rem 1rem 2.5rem; border-bottom: 2px dashed var(--club-blue, #5a9bd5); background-color: var(--club-blue-soft, #ebf3fa); background-image: linear-gradient(color-mix(in srgb, var(--club-blue, #5a9bd5) 18%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--club-blue, #5a9bd5) 18%, transparent) 1px, transparent 1px); background-size: 1.5rem 1.5rem; color: var(--ink, #0b2e4a); font-family: var(--font-body, Raleway, system-ui, sans-serif); } .ds-eyebrow { margin: 0 0 0.5rem; font-weight: 700; font-size: 0.875rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted, #3d5a70); } .ds-page-header h1 { margin: 0; font-size: clamp(2.25rem, 8vw, 4rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; } .ds-page-header h1 svg { margin-left: 0.15em; color: var(--club-blue, #5a9bd5); vertical-align: super; } .ds-lead { margin: 1rem 0 0; font-size: 1.1875rem; line-height: 1.6; max-width: 38rem; }"
+    },
+    {
+      "name": "Calendar Tile",
+      "kind": "custom",
+      "description": "Tear-off calendar page showing the Math Competition date.",
+      "html": "<div class=\"ds-calendar\" aria-hidden=\"true\"><span class=\"ds-cal-month\">Nov</span><span class=\"ds-cal-day\">21</span><span class=\"ds-cal-weekday\">Sat</span></div>",
+      "css": ".ds-calendar { display: grid; justify-items: center; width: 6.5rem; border: 2px solid var(--ink, #0b2e4a); border-radius: 0.75rem; overflow: hidden; text-align: center; line-height: 1; background: var(--paper, #fff); color: var(--ink, #0b2e4a); font-family: var(--font-body, Raleway, system-ui, sans-serif); font-variant-numeric: lining-nums; } .ds-cal-month { width: 100%; padding: 0.4rem 0; background: var(--club-blue, #5a9bd5); font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; } .ds-cal-day { padding-top: 0.5rem; font-size: 3rem; font-weight: 800; } .ds-cal-weekday { padding: 0.25rem 0 0.6rem; color: var(--ink-muted, #3d5a70); font-weight: 600; }"
+    },
+    {
+      "name": "Coming Soon",
+      "kind": "custom",
+      "refersTo": "coming-soon",
+      "description": "Dashed placeholder for a page or section that isn't written yet.",
+      "html": "<p class=\"ds-coming-soon\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" aria-hidden=\"true\"><path d=\"M12 0C13 8 16 11 24 12 16 13 13 16 12 24 11 16 8 13 0 12 8 11 11 8 12 0Z\" fill=\"currentColor\"/></svg><span>The Sponsorship Prospectus is coming soon.</span></p>",
+      "css": ".ds-coming-soon { display: flex; align-items: center; gap: 0.75rem; margin: 0; padding: 1rem 1.25rem; background: var(--paper, #fff); border: 2px dashed var(--club-blue, #5a9bd5); border-radius: 1rem; color: var(--ink-muted, #3d5a70); font-family: var(--font-body, Raleway, system-ui, sans-serif); } .ds-coming-soon svg { flex-shrink: 0; color: var(--club-blue, #5a9bd5); }"
+    },
+    {
+      "name": "Countdown Pill",
+      "kind": "chip",
+      "refersTo": "countdown-pill",
+      "description": "Highlighter Yellow pill beside the Math Competition date.",
+      "html": "<p class=\"ds-date\">Saturday, November 21, 2026 <span class=\"ds-countdown\">40 days to go</span></p>",
+      "css": ".ds-date { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; margin: 0; font-family: var(--font-body, Raleway, system-ui, sans-serif); font-size: 1.25rem; font-weight: 700; color: var(--ink, #0b2e4a); font-variant-numeric: lining-nums; } .ds-countdown { padding: 0.15rem 0.7rem; border-radius: 999px; background: var(--sun, #ffcb47); font-size: 0.9375rem; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Route Map",
+    "overview": "The club's name is the metaphor. Every page is a stop on a route that starts with a single dot and ends at a star: the home page draws that route as a marching dotted line, the competition card is labelled \"Next stop\", and the footer signs off with \"Every route starts with a first step.\" The map is drawn on a student's maths paper: soft blue graph-paper banners, navy ink outlines like the hand-drawn logo, and a yellow highlighter on the words that matter most.\n\nThe mood is bright, friendly and hand-made. The site speaks first to Parents of children aged 6 to 11, so it is cheerful and welcoming, but it stays tidy and exact enough that a Sponsor reads it as a real, organised club. It is a light, single-scheme site (`color-scheme: light`) with generous spacing, one typeface, and chunky outlined shapes that look inked rather than rendered.\n\nEach year's Math Competition can add a Theme on top: one accent colour and one piece of artwork, used in the home page banner, the Rounds section and the Math Competition page. The Theme is a layer; the club's own look stays underneath it and returns on every other page.",
+    "keyCharacteristics": [
+      "Navy ink outlines (2px) on almost everything you can see or press.",
+      "Flat surfaces lifted by solid, unblurred offset shadows, like stickers.",
+      "Pills for anything small and clickable; 1rem rounded corners for cards.",
+      "Graph paper behind banners; a highlighter stroke behind key words.",
+      "The four-pointed Sparkle from the logo as the only decorative icon.",
+      "One typeface (Raleway) at heavy weights for headings.",
+      "A yearly Theme layered on through a single `--accent` colour and its artwork."
+    ],
+    "rules": [
+      { "name": "The Dark Text on Light Colour Rule", "body": "Text on Club Blue and on Highlighter Yellow is always Navy Ink. White text on Club Blue doesn't have enough contrast.", "section": "colors" },
+      { "name": "The Highlighter Rule", "body": "Highlighter Yellow marks one thing at a time: a word, a star, a countdown, a sparkle. It is never a section background or a large fill.", "section": "colors" },
+      { "name": "The Lining Numbers Rule", "body": "Raleway's default numbers dip below the line, so the whole site sets `font-variant-numeric: lining-nums`. Dates, years and fees must look even.", "section": "typography" },
+      { "name": "The Eyebrow Rule", "body": "A section heading gets a short uppercase eyebrow above it that says where you are on the route (\"The Math Competition\", \"Support the club\"), not a repeat of the heading.", "section": "typography" },
+      { "name": "The No Blur Rule", "body": "Every shadow has zero blur and zero spread. A soft drop shadow breaks the hand-inked look.", "section": "elevation" }
+    ],
+    "dos": [
+      "**Do** outline cards, buttons and chips in 2px Navy Ink and give them a solid offset shadow with no blur.",
+      "**Do** use full pills (999px) for buttons, chips, nav links and small tags, and 1rem corners for cards.",
+      "**Do** keep text Navy Ink on Club Blue, Club Blue Soft and Highlighter Yellow.",
+      "**Do** put graph paper behind banners and page headers, and a highlighter stroke behind no more than one key word in a heading.",
+      "**Do** use the four-pointed Sparkle as the decorative icon, hidden from screen readers.",
+      "**Do** bring in a year's Theme only through its `--accent` colour and artwork, set from the Math Competition's data file.",
+      "**Do** use a dashed outline and a \"coming soon\" note for anything not ready yet, instead of leaving a gap or making something up.",
+      "**Do** let every animation and transition switch off under `prefers-reduced-motion` (the site already does this globally)."
+    ],
+    "donts": [
+      "**Don't** put white text on Club Blue.",
+      "**Don't** use soft, blurred or coloured-glow shadows, or gradients other than the graph-paper grid and the highlighter stroke.",
+      "**Don't** fill a section or large area with Highlighter Yellow.",
+      "**Don't** add a second typeface by hard-coding it; change `--font-display` if headings ever get their own font.",
+      "**Don't** let a Theme replace the club's look on pages beyond the home banner, the Rounds band and the Math Competition page.",
+      "**Don't** show photos of people who aren't covered by a Photo Release."
+    ]
+  }
+}
