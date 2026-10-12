@@ -1,0 +1,12 @@
+---
+// Draws a Math Competition's Theme artwork, if it has any. Add new Themes here.
+import UnderTheSea from './UnderTheSea.astro';
+
+interface Props {
+  artwork?: 'under-the-sea';
+}
+
+const { artwork } = Astro.props;
+---
+
+{artwork === 'under-the-sea' && <UnderTheSea />}

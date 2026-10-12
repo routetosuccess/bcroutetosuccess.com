@@ -1,0 +1,67 @@
+---
+// One Event on the Events page.
+import Sparkle from './Sparkle.astro';
+import { formatDate } from '../lib/competitions';
+
+interface Props {
+  event: {
+    id: string;
+    name: string;
+    date?: Date;
+    role?: 'runs' | 'takes-part';
+    summary?: string;
+  };
+  // Main Events are their own section, so their name is a section heading; smaller ones sit one level down.
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { event, headingLevel = 'h2' } = Astro.props;
+const Heading = headingLevel;
+const roleLabel = { runs: 'Run by the club', 'takes-part': 'The club takes part' };
+---
+
+<article class="card event" id={event.id}>
+  <Sparkle size="2rem" />
+  <Heading>{event.name}</Heading>
+  {event.role && <p class="role">{roleLabel[event.role]}</p>}
+  <p class="date">{event.date ? formatDate(event.date) : 'Date to be announced'}</p>
+  <p>{event.summary ?? 'More details coming soon.'}</p>
+</article>
+
+<style>
+  .event {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    /* Leave room for the pinned menu when the dropdown jumps here. */
+    scroll-margin-top: 7rem;
+  }
+
+  .event :global(.sparkle) {
+    color: var(--club-blue);
+  }
+
+  h2,
+  h3 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  .role {
+    align-self: flex-start;
+    padding: 0.15rem 0.7rem;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: var(--club-blue-soft);
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .date {
+    font-weight: 700;
+  }
+</style>

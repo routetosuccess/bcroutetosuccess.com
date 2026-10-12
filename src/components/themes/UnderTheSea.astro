@@ -1,0 +1,63 @@
+---
+// Artwork for the "Under the Sea" Theme (2026): the watercolour jellyfish and coral from the flyer.
+// Fills its parent, which must be position: relative. Purely decorative, so it's hidden from screen readers.
+import { Image } from 'astro:assets';
+import art from '../../assets/themes/under-the-sea.webp';
+---
+
+<div class="under-the-sea" aria-hidden="true">
+  <Image
+    class="art"
+    src={art}
+    alt=""
+    widths={[640, 1000, 1545]}
+    sizes="(min-width: 52rem) 58vw, 100vw"
+    loading="eager"
+    fetchpriority="high"
+  />
+
+  <svg class="shore" viewBox="0 0 1440 60" preserveAspectRatio="none" focusable="false">
+    <path d="M0 30C200 8 400 12 620 30S1000 52 1200 34 1380 22 1440 28V60H0Z" />
+  </svg>
+</div>
+
+<style>
+  .under-the-sea {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    /* The exact blue of the artwork's water, so the picture's edges disappear into it. */
+    background: #1c4ea3;
+  }
+
+  /* On phones the artwork fills the banner, dimmed so the white text on top stays readable. */
+  .under-the-sea :global(.art) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center bottom;
+    opacity: 0.45;
+  }
+
+  /* On wider screens it sits on the right at full strength, fading into the water on its left edge. */
+  @media (min-width: 52rem) {
+    .under-the-sea :global(.art) {
+      left: auto;
+      width: 58%;
+      object-position: left bottom;
+      opacity: 1;
+      mask-image: linear-gradient(90deg, transparent, black 30%);
+    }
+  }
+
+  .shore {
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 100%;
+    height: 2.5rem;
+    fill: var(--paper);
+  }
+</style>

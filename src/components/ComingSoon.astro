@@ -1,0 +1,33 @@
+---
+// Stands in for a section or page that hasn't been written yet, so menu links never lead to a missing page.
+import Sparkle from './Sparkle.astro';
+
+interface Props {
+  text?: string;
+}
+
+const { text = 'This page is coming soon.' } = Astro.props;
+---
+
+<p class="coming-soon">
+  <Sparkle size="1.25rem" />
+  <span>{text}</span>
+</p>
+
+<style>
+  .coming-soon {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--paper);
+    border: 2px dashed var(--club-blue);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    color: var(--ink-muted);
+  }
+
+  .coming-soon :global(.sparkle) {
+    flex-shrink: 0;
+    color: var(--club-blue);
+  }
+</style>

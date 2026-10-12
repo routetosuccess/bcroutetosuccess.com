@@ -1,0 +1,13 @@
+---
+// The four-pointed star from the club logo. Decorative, so screen readers skip it.
+interface Props {
+  size?: string;
+  class?: string;
+}
+
+const { size = '1.5rem', class: className } = Astro.props;
+---
+
+<svg class:list={['sparkle', className]} viewBox="0 0 24 24" width={size} height={size} aria-hidden="true" focusable="false">
+  <path d="M12 0C13 8 16 11 24 12 16 13 13 16 12 24 11 16 8 13 0 12 8 11 11 8 12 0Z" fill="currentColor" />
+</svg>

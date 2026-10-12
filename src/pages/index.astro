@@ -1,17 +1,20 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Sparkle from '../components/Sparkle.astro';
+import PlaceholderTag from '../components/PlaceholderTag.astro';
+import ThemeArtwork from '../components/themes/ThemeArtwork.astro';
+import { countWord, formatDate, getCurrentCompetition, registrationOpenText, registrationOpensText } from '../lib/competitions';
 
-// The current Math Competition is the newest one that isn't Past yet.
-const competitions = await getCollection('competitions');
-const current = competitions
-  .map((entry) => entry.data)
-  .filter((competition) => competition.stage !== 'past')
-  .sort((a, b) => b.year - a.year)[0];
+const current = await getCurrentCompetition();
 
-// Dates are stored without a time, so format them in UTC to avoid showing the day before in Arizona.
-const formatDate = (date: Date) =>
-  date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+// When the current Math Competition's Theme has artwork, the home page banner and the Rounds section take on its look.
+const themed = Boolean(current?.theme.artwork);
+
+const datePart = (date: Date, part: 'month' | 'day' | 'weekday') =>
+  date.toLocaleDateString('en-US', {
+    timeZone: 'UTC',
+    ...(part === 'month' ? { month: 'short' } : part === 'day' ? { day: 'numeric' } : { weekday: 'short' }),
+  });
 
 // Don't name the Beneficiary until the Club Adviser and the Beneficiary have agreed.
 const beneficiaryText = current?.beneficiary
@@ -19,110 +22,520 @@ const beneficiaryText = current?.beneficiary
     ? current.beneficiary.name
     : 'a local youth charity'
   : undefined;
+
+const rounds = ['Sprint', 'Target', 'Team', 'Countdown'];
+const divisions = current?.divisions ?? [];
 ---
 
 <BaseLayout title="Route to Success" accent={current?.theme.color}>
-  <section class="hero">
-    <p class="eyebrow">A student club at BASIS Chandler</p>
-    <h1>Route to Success</h1>
-    <p class="lead">We run a yearly Math Competition for students, and take part in events across our school community.</p>
+  <section class:list={['hero', themed ? 'themed' : 'graph-paper']}>
+    {themed && <ThemeArtwork artwork={current?.theme.artwork} />}
+    <div class="container hero-inner">
+      <div class="hero-text">
+        <p class="eyebrow">A student club at BASIS Chandler</p>
+        <h1>Find your route to <span class="highlight">success</span>. <PlaceholderTag /></h1>
+        <p class="lead">We run a yearly Math Competition for students, and take part in events across our school community.</p>
+        <div class="actions">
+          {
+            current && (
+              <a class="button" href="/math-competition">
+                {current.year} Math Competition <span aria-hidden="true">→</span>
+              </a>
+            )
+          }
+          <a class="button secondary" href="/sponsors">Become a Sponsor</a>
+        </div>
+      </div>
+
+      {
+        !themed && (
+          /* A winding route from a starting dot to the club's star. Decorative only. */
+          <svg class="hero-route" viewBox="0 0 400 340" aria-hidden="true" focusable="false">
+            <g class="math-glyphs">
+              <text x="40" y="70">π</text>
+              <text x="300" y="250">√</text>
+              <text x="110" y="180">+</text>
+              <text x="330" y="140">×</text>
+              <text x="60" y="320">∑</text>
+            </g>
+            <path class="route" d="M30 300C120 300 80 210 170 200S270 130 220 90 300 40 340 55" />
+            <circle class="start" cx="30" cy="300" r="10" />
+            <circle class="stop" cx="170" cy="200" r="9" />
+            <circle class="stop" cx="220" cy="90" r="9" />
+            <path class="star" d="M352 18C355 42 364 51 388 54 364 57 355 66 352 90 349 66 340 57 316 54 340 51 349 42 352 18Z" />
+            </svg>
+        )
+      }
+    </div>
   </section>
 
   {
     current && (
-      <section class="competition" aria-labelledby="competition-heading">
-        <h2 id="competition-heading">{current.year} Math Competition</h2>
-        {current.theme.name && <p class="theme">Theme: {current.theme.name}</p>}
-        {current.date && <p class="date">{formatDate(current.date)}</p>}
-        {current.location && <p>{current.location}</p>}
-
-        {current.stage === 'upcoming' && current.registration && (
-          <p>Registration opens {formatDate(current.registration.opens)}.</p>
-        )}
-
-        {current.stage === 'registration-open' && current.registration && (
-          <>
-            <p>Registration is open until {formatDate(current.registration.closes)}.</p>
-            {current.registration.formUrl && (
-              <a class="button" href={current.registration.formUrl}>
-                Register now
-              </a>
+      <section class="section next-stop" aria-labelledby="competition-heading">
+        <div class="container">
+          <div class="card competition">
+            {current.date && (
+              <div class="calendar" aria-hidden="true">
+                <span class="cal-month">{datePart(current.date, 'month')}</span>
+                <span class="cal-day">{datePart(current.date, 'day')}</span>
+                <span class="cal-weekday">{datePart(current.date, 'weekday')}</span>
+              </div>
             )}
-          </>
-        )}
 
-        {current.stage === 'registration-closed' && (
-          <p>
-            Online registration is closed.
-            {current.walkIns && current.date && ` Walk-ins are welcome on ${formatDate(current.date)}.`}
-          </p>
-        )}
+            <div class="competition-text">
+              <p class="eyebrow">Next stop</p>
+              <h2 id="competition-heading">{current.year} Math Competition</h2>
+              {current.theme.name && <p class="theme">Theme: {current.theme.name}</p>}
+              {current.date && (
+                <p class="date">
+                  {formatDate(current.date)}
+                  <span class="countdown" data-date={current.date.toISOString().slice(0, 10)} />
+                </p>
+              )}
+              {current.location && <p>{current.location}</p>}
+              {current.entryFee !== undefined && <p>Entry Fee: ${current.entryFee} per Competitor.</p>}
 
-        {beneficiaryText && <p>Entry Fees support {beneficiaryText}.</p>}
+              {current.stage === 'upcoming' && current.registration && (
+                <p>{registrationOpensText(current.registration)}</p>
+              )}
 
-        <a class="more" href="/math-competition">
-          About the Math Competition
-        </a>
+              {current.stage === 'registration-open' && current.registration && (
+                <p>{registrationOpenText(current.registration)}</p>
+              )}
+
+              {(current.stage === 'upcoming' || current.stage === 'registration-open') &&
+                (current.registration?.formUrl ? (
+                  <a class="button" href={current.registration.formUrl}>
+                    Register now <span aria-hidden="true">→</span>
+                  </a>
+                ) : (
+                  <p class="link-soon">Registration link coming soon</p>
+                ))}
+
+              {current.stage === 'registration-closed' && (
+                <p>
+                  Online registration is closed.
+                  {current.walkIns && current.date && ` Walk-ins are welcome on ${formatDate(current.date)}.`}
+                </p>
+              )}
+
+              {beneficiaryText && <p>Entry Fees support {beneficiaryText}.</p>}
+            </div>
+
+          </div>
+        </div>
       </section>
     )
   }
+
+  <section class:list={['section', 'how-it-works', { themed }]} aria-labelledby="how-heading">
+    <div class="container">
+      <p class="eyebrow">The Math Competition</p>
+      <h2 id="how-heading">
+        Four Rounds. {countWord(divisions.length)} Divisions. One big day. <PlaceholderTag />
+      </h2>
+      <div class="facts">
+        <div class="card fact">
+          <span class="fact-number">4</span>
+          <h3>Rounds</h3>
+          <ul class="chips">{rounds.map((round) => <li>{round}</li>)}</ul>
+        </div>
+        <div class="card fact">
+          <span class="fact-number">{divisions.length}</span>
+          <h3>Divisions</h3>
+          <p>
+            Competitors are grouped by grade, so everyone competes against students of a similar age. <PlaceholderTag />
+          </p>
+          <ul class="chips">
+            {
+              divisions.map((division) => (
+                <li>
+                  {division.name}
+                  {division.grades && <span class="chip-detail"> · {division.grades}</span>}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+      <a class="more" href="/math-competition#rounds-and-divisions">
+        More about Rounds &amp; Divisions <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section get-involved" aria-labelledby="involved-heading">
+    <div class="container">
+      <p class="eyebrow">Get involved</p>
+      <h2 id="involved-heading">Help more students find their route. <PlaceholderTag /></h2>
+      <div class="involve-grid">
+        <a class="card involve" href="/sponsors">
+          <Sparkle size="2rem" />
+          <h3>Sponsor the Math Competition</h3>
+          <p>Support the club and get recognised by the families who take part. <PlaceholderTag /></p>
+          <span class="involve-link">Become a Sponsor <span aria-hidden="true">→</span></span>
+        </a>
+        <a class="card involve" href="/events">
+          <Sparkle size="2rem" />
+          <h3>See our Events</h3>
+          <p>Find out what else the club runs and takes part in at BASIS Chandler. <PlaceholderTag /></p>
+          <span class="involve-link">Explore Events <span aria-hidden="true">→</span></span>
+        </a>
+      </div>
+    </div>
+  </section>
 </BaseLayout>
+
+<script>
+  // Shows "N days to go" next to the competition date, counted in the visitor's own calendar.
+  document.querySelectorAll<HTMLElement>('.countdown').forEach((element) => {
+    const [year, month, day] = (element.dataset.date ?? '').split('-').map(Number);
+    const now = new Date();
+    const days = Math.round(
+      (Date.UTC(year, month - 1, day) - Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())) / 86_400_000,
+    );
+    if (days > 1) element.textContent = `${days} days to go`;
+    else if (days === 1) element.textContent = 'Tomorrow!';
+    else if (days === 0) element.textContent = 'Today!';
+  });
+</script>
 
 <style>
   .hero {
-    padding-block: 1rem 2rem;
+    position: relative;
+    border-bottom: 2px solid var(--ink);
+    overflow: hidden;
   }
 
-  .eyebrow {
-    margin: 0;
+  /* On the Theme artwork: white text, with the dark offset shadow used on the Math Competition page. */
+  .hero.themed {
+    color: var(--paper);
+    border-bottom: 0;
+  }
+
+  .hero.themed .eyebrow {
+    color: var(--paper);
+  }
+
+  .hero.themed h1 {
+    text-shadow: 0.05em 0.05em 0 var(--ink);
+  }
+
+  /* The yellow highlighter stroke doesn't work behind white text, so the word turns yellow instead. */
+  .hero.themed .highlight {
+    background: none;
+    color: var(--sun);
+  }
+
+  .hero-inner {
+    position: relative;
+    display: grid;
+    gap: 1rem;
+    align-items: center;
+    padding-block: 3rem 3.5rem;
+  }
+
+  .hero h1 {
+    margin: 0 0 1rem;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+    margin-top: 1.75rem;
+  }
+
+  .hero-route {
+    width: 100%;
+    max-width: 17rem;
+    justify-self: center;
+  }
+
+  .route {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 0.1 14;
+    animation: march 1.5s linear infinite;
+  }
+
+  @keyframes march {
+    to {
+      stroke-dashoffset: -14.1;
+    }
+  }
+
+  .start {
+    fill: var(--club-blue);
+    stroke: var(--ink);
+    stroke-width: 3;
+  }
+
+  .stop {
+    fill: var(--paper);
+    stroke: var(--ink);
+    stroke-width: 3;
+  }
+
+  .star {
+    fill: var(--sun);
+    stroke: var(--ink);
+    stroke-width: 3;
+    stroke-linejoin: round;
+    transform-origin: 352px 54px;
+    animation: twinkle 3s ease-in-out infinite;
+  }
+
+  @keyframes twinkle {
+    50% {
+      transform: scale(1.12) rotate(8deg);
+    }
+  }
+
+  .math-glyphs text {
+    font-family: var(--font-display);
+    font-size: 40px;
+    font-weight: 800;
+    fill: color-mix(in srgb, var(--club-blue) 55%, transparent);
+  }
+
+  /* Room for the wave at the bottom of the Theme artwork. */
+  .hero.themed .hero-inner {
+    padding-bottom: 5rem;
+  }
+
+  @media (min-width: 52rem) {
+    .hero-inner {
+      grid-template-columns: 1.2fr 1fr;
+      padding-block: 4.5rem 5rem;
+    }
+
+    .hero.themed .hero-inner {
+      padding-bottom: 7rem;
+    }
+
+    .hero-route {
+      max-width: 26rem;
+    }
+  }
+
+  .competition {
+    display: grid;
+    gap: 1.5rem;
+    border-top: 0.75rem solid var(--accent);
+  }
+
+  .calendar {
+    align-self: start;
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    width: 6.5rem;
+    border: 2px solid var(--ink);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    text-align: center;
+    line-height: 1;
+  }
+
+  .cal-month {
+    width: 100%;
+    padding: 0.4rem 0;
+    background: var(--club-blue);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .cal-day {
+    padding-top: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 800;
+  }
+
+  .cal-weekday {
+    padding: 0.25rem 0 0.6rem;
     color: var(--ink-muted);
     font-weight: 600;
   }
 
-  h1 {
-    font-size: clamp(2rem, 8vw, 3.5rem);
-    line-height: 1.1;
-    margin: 0.25rem 0 1rem;
-  }
-
-  .lead {
-    font-size: 1.125rem;
-    max-width: 40rem;
-  }
-
-  .competition {
-    background: var(--club-blue-soft);
-    border-top: 0.5rem solid var(--accent);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-  }
-
   .competition h2 {
-    margin-top: 0;
+    margin: 0 0 0.5rem;
   }
 
-  .date {
-    font-size: 1.25rem;
-    font-weight: 700;
+  .competition-text p {
+    margin: 0.25rem 0 0.75rem;
   }
 
   .theme {
     color: var(--ink-muted);
   }
 
-  .button {
-    display: inline-block;
-    background: var(--ink);
+  .date {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .countdown:not(:empty) {
+    padding: 0.15rem 0.7rem;
+    border-radius: 999px;
+    background: var(--sun);
+    font-size: 0.9375rem;
+  }
+
+  @media (min-width: 52rem) {
+    .competition {
+      grid-template-columns: auto 1fr;
+      column-gap: 2rem;
+      padding: 2rem;
+    }
+  }
+
+  .how-it-works {
+    background: var(--club-blue-soft);
+    border-block: 2px solid var(--ink);
+  }
+
+  /* The Theme's own colour, e.g. the deep blue of the Under the Sea artwork. */
+  .how-it-works.themed {
+    background: var(--accent);
     color: var(--paper);
-    padding: 0.75rem 1.25rem;
-    border-radius: var(--radius);
-    text-decoration: none;
-    font-weight: 600;
+  }
+
+  .how-it-works.themed .eyebrow {
+    color: var(--paper);
+  }
+
+  .how-it-works h2,
+  .get-involved h2 {
+    margin: 0 0 2rem;
+    max-width: 36rem;
+  }
+
+  .facts {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 44rem) {
+    .facts {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .fact {
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Keep the card's text above the big numeral. */
+  .fact > :not(.fact-number) {
+    position: relative;
+  }
+
+  .fact h3 {
+    margin: 0 0 0.75rem;
+  }
+
+  .fact p {
+    margin: 0 0 1rem;
+    max-width: 22rem;
+  }
+
+  /* A big numeral tucked into the corner of the card. */
+  .fact-number {
+    position: absolute;
+    right: 1rem;
+    top: -1rem;
+    font-family: var(--font-display);
+    font-size: 7rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--club-blue);
+    opacity: 0.35;
+  }
+
+  .chips {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .chip-detail {
+    font-weight: 500;
+  }
+
+  .link-soon {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border: 2px dashed var(--ink);
+    border-radius: 999px;
+    font-weight: 700;
+  }
+
+  .chips li {
+    padding: 0.3rem 0.9rem;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: var(--club-blue-soft);
+    font-weight: 700;
   }
 
   .more {
     display: inline-block;
-    margin-top: 0.5rem;
-    font-weight: 600;
+    margin-top: 1.75rem;
+    font-weight: 700;
+  }
+
+  .involve-grid {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 44rem) {
+    .involve-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .involve {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .involve:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.45rem 0 var(--ink);
+  }
+
+  .involve :global(.sparkle) {
+    color: var(--club-blue);
+  }
+
+  .involve h3,
+  .involve p {
+    margin: 0;
+  }
+
+  .involve-link {
+    margin-top: auto;
+    padding-top: 0.75rem;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
   }
 </style>
