@@ -1,0 +1,363 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import ComingSoon from '../../components/ComingSoon.astro';
+import ThemeArtwork from '../../components/themes/ThemeArtwork.astro';
+import PlaceholderTag from '../../components/PlaceholderTag.astro';
+import { countWord, formatDate, getCurrentCompetition, ordinal, registrationOpenText, registrationOpensText } from '../../lib/competitions';
+
+const current = await getCurrentCompetition();
+
+const rounds = ['Sprint', 'Target', 'Team', 'Countdown'];
+const divisions = current?.divisions ?? [];
+
+// Don't name the Beneficiary until the Club Adviser and the Beneficiary have agreed.
+const beneficiaryText = current?.beneficiary
+  ? current.beneficiary.confirmed
+    ? current.beneficiary.name
+    : 'a local youth charity'
+  : undefined;
+
+const mapUrl = current?.location
+  ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.location)}`
+  : undefined;
+---
+
+<BaseLayout
+  title={current?.theme.name ? `${current.year} Math Competition: ${current.theme.name}` : 'Math Competition'}
+  description="The yearly Math Competition run by Route to Success at BASIS Chandler."
+  accent={current?.theme.color}
+>
+  {
+    current ? (
+      <section class:list={['competition-hero', { themed: current.theme.artwork }]}>
+        <ThemeArtwork artwork={current.theme.artwork} />
+
+        <div class="container hero-inner">
+          <div class="hero-text">
+            <p class="presents">
+              Route to Success
+              {current.coHost && (
+                <>
+                  <span class="times" aria-label="and">×</span>
+                  {current.coHost}
+                </>
+              )}
+            </p>
+            <h1>
+              {/* Largest to smallest: Math Competition, 7th Annual, at BASIS Chandler, then the Theme. */}
+              {current.edition && <span class="edition">{ordinal(current.edition)} Annual </span>}
+              <span class="event-name">Math Competition </span>
+              <span class="school">at BASIS Chandler </span>
+              {current.theme.name && <span class="theme-name">{' '}{current.theme.name}</span>}
+            </h1>
+          </div>
+
+          <dl class="card details">
+            {current.date && (
+              <div>
+                <dt>When</dt>
+                <dd>{formatDate(current.date)}</dd>
+              </div>
+            )}
+            {current.time && (
+              <div>
+                <dt>Time</dt>
+                <dd>{current.time}</dd>
+              </div>
+            )}
+            {current.grades && (
+              <div>
+                <dt>Who</dt>
+                <dd>{current.grades} welcome!</dd>
+              </div>
+            )}
+            {current.location && (
+              <div>
+                <dt>Where</dt>
+                <dd>
+                  BASIS Chandler
+                  <br />
+                  <a href={mapUrl}>{current.location}</a>
+                </dd>
+              </div>
+            )}
+          </dl>
+        </div>
+      </section>
+    ) : (
+      <PageHeader title="Math Competition" />
+    )
+  }
+
+  <div class="container page-body">
+    <p class="intro lead">
+      Every year, Route to Success runs a Math Competition for students. Competitors solve problems across four Rounds,
+      grouped into Divisions by grade.
+      <PlaceholderTag />
+    </p>
+
+    <!-- The footer links to each of these sections by its id. -->
+    <section id="register">
+      <h2>Register</h2>
+      {
+        current?.registration ? (
+          <div class="card register">
+            {current.stage === 'upcoming' && <p>{registrationOpensText(current.registration)}</p>}
+            {current.stage === 'registration-open' && (
+              <p>{registrationOpenText(current.registration)}</p>
+            )}
+            {current.stage === 'registration-closed' && (
+              <p>
+                Online registration is closed.
+                {current.walkIns && current.date && ` Walk-ins are welcome on ${formatDate(current.date)}.`}
+              </p>
+            )}
+            {current.entryFee !== undefined && <p>Entry Fee: ${current.entryFee} per Competitor.</p>}
+            {beneficiaryText && <p>Entry Fees support {beneficiaryText}.</p>}
+            {(current.stage === 'upcoming' || current.stage === 'registration-open') &&
+              (current.registration.formUrl ? (
+                <a class="button" href={current.registration.formUrl}>
+                  Register now <span aria-hidden="true">→</span>
+                </a>
+              ) : (
+                <p class="link-soon">Registration link coming soon</p>
+              ))}
+          </div>
+        ) : (
+          <ComingSoon text="Registration details are coming soon." />
+        )
+      }
+    </section>
+
+    <section id="rounds-and-divisions">
+      <h2>Rounds &amp; Divisions</h2>
+      <div class="facts">
+        <div class="card">
+          <h3>Four Rounds</h3>
+          <ul class="chips">{rounds.map((round) => <li>{round}</li>)}</ul>
+        </div>
+        <div class="card">
+          <h3>{countWord(divisions.length)} Divisions</h3>
+          <p>
+            Competitors are grouped by grade, so everyone competes against students of a similar age. <PlaceholderTag />
+            {current?.grades && ` This year is open to ${current.grades.toLowerCase()}.`}
+          </p>
+          <ul class="chips">
+            {
+              divisions.map((division) => (
+                <li>
+                  {division.name}
+                  {division.grades && <span class="chip-detail"> · {division.grades}</span>}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="sample-questions">
+      <h2>Sample Questions</h2>
+      <ComingSoon text="Sample questions are coming soon." />
+    </section>
+
+    <section id="faq">
+      <h2>FAQ</h2>
+      <ComingSoon text="Answers to common questions are coming soon." />
+    </section>
+
+    <section>
+      <a class="button secondary" href="/math-competition/past">
+        Past Competitions <span aria-hidden="true">→</span>
+      </a>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .competition-hero {
+    position: relative;
+    background: var(--club-blue-soft);
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .hero-inner {
+    position: relative;
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+    padding-block: 4.5rem 5.5rem;
+  }
+
+  /* Text sits on the dark water when the Theme has artwork. */
+  .themed {
+    color: var(--paper);
+    border-bottom: 0;
+  }
+
+  .presents {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 1rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+  }
+
+  .times {
+    color: var(--sun);
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  h1 {
+    margin: 0;
+  }
+
+  h1 > span {
+    display: block;
+  }
+
+  .edition {
+    font-size: clamp(1.75rem, 6vw, 2.75rem);
+    font-weight: 800;
+    line-height: 1.05;
+  }
+
+  .event-name {
+    font-size: clamp(2.75rem, 11vw, 5.5rem);
+    font-weight: 800;
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+
+  .school {
+    margin-top: 0.4rem;
+    font-size: clamp(1.375rem, 4.5vw, 2rem);
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  .theme-name {
+    margin-top: 0.75rem;
+    font-size: clamp(1.125rem, 3.5vw, 1.5rem);
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .themed .event-name {
+    color: var(--paper);
+    text-shadow: 0.06em 0.06em 0 var(--ink);
+  }
+
+  .details {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  .details div {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 0.75rem;
+  }
+
+  .details div + div {
+    padding-top: 1rem;
+    border-top: 2px dashed var(--club-blue);
+  }
+
+  dt {
+    font-weight: 800;
+    font-size: 0.875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    padding-top: 0.15rem;
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 700;
+  }
+
+  @media (min-width: 52rem) {
+    .hero-inner {
+      grid-template-columns: 1.4fr 1fr;
+      padding-block: 4.5rem 7rem;
+    }
+
+    /* With artwork, keep everything in the left column so the picture on the right stays in view. */
+    .themed .hero-inner {
+      grid-template-columns: minmax(0, 34rem);
+    }
+  }
+
+  .intro {
+    margin: 0 0 2.5rem;
+  }
+
+  .page-body h2 {
+    margin: 0 0 1rem;
+  }
+
+  .register p {
+    margin: 0 0 0.75rem;
+    font-weight: 600;
+  }
+
+  .facts {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 44rem) {
+    .facts {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .facts h3 {
+    margin: 0 0 0.75rem;
+  }
+
+  .facts p {
+    margin: 0 0 1rem;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .chip-detail {
+    font-weight: 500;
+  }
+
+  .link-soon {
+    display: inline-block;
+    margin-top: 0.25rem;
+    padding: 0.5rem 1rem;
+    border: 2px dashed var(--ink);
+    border-radius: 999px;
+    font-weight: 700;
+  }
+
+  .chips li {
+    padding: 0.3rem 0.9rem;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: var(--club-blue-soft);
+    font-weight: 700;
+  }
+</style>

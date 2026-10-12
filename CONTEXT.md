@@ -46,6 +46,10 @@ _Avoid_: math comp, comp, contest
 Where a Math Competition is in its lifecycle: Upcoming, Registration Open, Registration Closed, or Past.
 _Avoid_: status, phase
 
+**Co-host**:
+Another group that runs a Math Competition together with the club and is named alongside it, such as Mu Alpha Theta for 2026.
+_Avoid_: partner, collaborator
+
 **Beneficiary**:
 A nonprofit that a Math Competition raises money for, separate from the club itself.
 _Avoid_: charity, cause
@@ -58,6 +62,13 @@ _Avoid_: gift, supplies drive
 The visual identity (colour and artwork) of one Math Competition, layered on top of the club's own look.
 _Avoid_: branding, skin
 
+**Sadie Hawkins Dance**:
+An Event listed on the club's Events page.
+
+**STEM Festival**:
+An Event listed on the club's Events page.
+_Avoid_: STEM Fest
+
 **Asian Night Market**:
 A BASIS Chandler school Event that the club takes part in, but does not run.
 _Avoid_: ANM
@@ -68,7 +79,7 @@ _Avoid_: ANM
 One timed section of a Math Competition: Sprint, Target, Team, or Countdown.
 
 **Division**:
-A grade band that groups Competitors so they compete against students of similar age (Division 1, 2, 3).
+A grade band that groups Competitors so they compete against students of similar age (Division 1, 2, 3). Each Math Competition decides which Divisions it runs and which grades each one covers.
 _Avoid_: Dv1, level, bracket
 
 **Competitor**:
@@ -105,6 +116,6 @@ A Parent's consent for images of their Competitor to be published. Only people c
 - Each **Math Competition** sets its own **Entry Fee**, and is in exactly one **Stage** at a time.
 - A **Math Competition** may have a **Beneficiary**, and has its own **Theme** and its own **Sponsors**.
 - Each **Math Competition** has exactly one **Payment Method**. An **In-kind Donation** only happens with School Payment.
-- Rounds and Divisions have stayed the same across Math Competitions (2024, 2025, 2026).
+- Rounds have stayed the same across Math Competitions (2024, 2025, 2026). 2024 and 2025 ran Divisions 1–3; 2026 runs only Division 1 (grades 1–2) and Division 2 (grades 3–5).
 - Money raised through the club is received by BASIS Chandler's nonprofit, not by the club itself.
 - Demographics about **Competitors** are published only as totals, never in a form that could identify a child.

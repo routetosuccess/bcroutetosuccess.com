@@ -1,0 +1,54 @@
+---
+// The graph-paper banner at the top of every page except the home page.
+import Sparkle from './Sparkle.astro';
+import PlaceholderTag from './PlaceholderTag.astro';
+
+interface Props {
+  title: string;
+  eyebrow?: string;
+  lead?: string;
+  // True when the lead is wording Claude drafted that the club hasn't approved yet.
+  leadIsPlaceholder?: boolean;
+}
+
+const { title, eyebrow, lead, leadIsPlaceholder = false } = Astro.props;
+---
+
+<header class="page-header graph-paper">
+  <div class="container">
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <h1>
+      {title}
+      <Sparkle class="header-sparkle" size="0.6em" />
+    </h1>
+    {
+      lead && (
+        <p class="lead">
+          {lead}
+          {leadIsPlaceholder && <PlaceholderTag />}
+        </p>
+      )
+    }
+  </div>
+</header>
+
+<style>
+  .page-header {
+    padding-block: 3rem 2.5rem;
+    border-bottom: 2px dashed var(--club-blue);
+  }
+
+  h1 {
+    margin: 0;
+  }
+
+  h1 :global(.header-sparkle) {
+    margin-left: 0.15em;
+    color: var(--club-blue);
+    vertical-align: super;
+  }
+
+  .lead {
+    margin-bottom: 0;
+  }
+</style>

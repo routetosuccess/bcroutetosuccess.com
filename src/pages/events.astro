@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import EventCard from '../components/EventCard.astro';
+import { getEvents, smallerEventsId } from '../lib/events';
+
+const { main, smaller } = await getEvents();
+---
+
+<BaseLayout title="Other Events" description="Events that Route to Success runs or takes part in.">
+  <PageHeader
+    title="Other Events"
+    lead="Besides the Math Competition, Route to Success runs and takes part in Events across the BASIS Chandler community."
+    leadIsPlaceholder
+  />
+  <div class="container page-body">
+    <div class="events">
+      {main.map((event) => <EventCard event={event} />)}
+    </div>
+
+    {
+      smaller.length > 0 && (
+        <section id={smallerEventsId} class="smaller" aria-labelledby="smaller-heading">
+          <h2 id="smaller-heading">Smaller Events</h2>
+          <div class="events">
+            {smaller.map((event) => <EventCard event={event} headingLevel="h3" />)}
+          </div>
+        </section>
+      )
+    }
+
+    <p class="past">
+      <a class="button secondary" href="/math-competition/past">
+        Past Math Competitions <span aria-hidden="true">→</span>
+      </a>
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .events {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 44rem) {
+    .events {
+      grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    }
+  }
+
+  .smaller {
+    margin-top: 3.5rem;
+    scroll-margin-top: 7rem;
+  }
+
+  .smaller h2 {
+    margin: 0 0 1.25rem;
+  }
+
+  .past {
+    margin: 3.5rem 0 0;
+  }
+</style>

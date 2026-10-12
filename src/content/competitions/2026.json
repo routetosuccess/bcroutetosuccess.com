@@ -1,12 +1,29 @@
 {
   "year": 2026,
+  "edition": 7,
+  "coHost": "Mu Alpha Theta",
   "date": "2026-11-21",
+  "time": "9 a.m. – 12:30 p.m.",
+  "grades": "Grades 1–5",
+  "location": "4825 S Arizona Ave, Chandler, AZ 85248",
+  "divisions": [
+    { "name": "Division 1", "grades": "Grades 1–2" },
+    { "name": "Division 2", "grades": "Grades 3–5" }
+  ],
   "stage": "upcoming",
+  "entryFee": 10,
   "paymentMethod": "school-payment",
-  "theme": {},
+  "beneficiary": {
+    "name": "Homeless Youth Connection",
+    "confirmed": true
+  },
+  "theme": {
+    "name": "Under the Sea",
+    "color": "#1c4ea3",
+    "artwork": "under-the-sea"
+  },
   "registration": {
-    "opens": "2026-10-11",
-    "closes": "2026-11-14"
+    "opensIn": "November"
   },
   "sponsors": []
 }

@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import ComingSoon from '../components/ComingSoon.astro';
+---
+
+<BaseLayout title="Sponsors" description="Sponsor the Route to Success Math Competition.">
+  <PageHeader eyebrow="Support the club" title="Sponsors" lead="Sponsors help Route to Success run the Math Competition."
+    leadIsPlaceholder
+  />
+  <div class="container page-body">
+    <section>
+      <ComingSoon />
+    </section>
+
+    <!-- The footer's Prospectus link points here. -->
+    <section id="prospectus">
+      <h2>Sponsorship Prospectus</h2>
+      <ComingSoon text="The Sponsorship Prospectus is coming soon." />
+    </section>
+  </div>
+</BaseLayout>
