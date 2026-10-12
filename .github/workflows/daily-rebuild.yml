@@ -1,0 +1,38 @@
+# Rebuilds the site on Cloudflare Pages every night, just after midnight in Arizona.
+# Some pages depend on today's date (the home page switches to "finished" once a Math Competition
+# is over), and a static site only notices the date when it's rebuilt.
+#
+# Needs, on the GitHub repo:
+# - the secret CF_PAGES_API_TOKEN: a Cloudflare API token with only "Pages Write" (it expires 2027-10-12;
+#   when it does, this workflow fails and GitHub emails the repo admins, so make a new one)
+# - the variable CF_ACCOUNT_ID: the club's Cloudflare account ID
+name: Daily rebuild
+
+on:
+  schedule:
+    # 07:15 UTC is 12:15 a.m. in Arizona, which doesn't change its clocks.
+    - cron: '15 7 * * *'
+  # Lets you run it by hand from the Actions tab.
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Start a Cloudflare Pages build of main
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_PAGES_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ vars.CF_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CF_API_TOKEN" ] || [ -z "$CF_ACCOUNT_ID" ]; then
+            echo "CF_PAGES_API_TOKEN or CF_ACCOUNT_ID isn't set on the repo, so there's nothing to call."
+            exit 1
+          fi
+          curl --fail --silent --show-error --request POST \
+            --header "Authorization: Bearer $CF_API_TOKEN" \
+            --form branch=main \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects/bcroutetosuccess/deployments" \
+            > /dev/null
+          echo "Started a new build of main."

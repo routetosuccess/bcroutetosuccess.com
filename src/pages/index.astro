@@ -1,9 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import RouteTimeline from '../components/RouteTimeline.astro';
 import Sparkle from '../components/Sparkle.astro';
-import PlaceholderTag from '../components/PlaceholderTag.astro';
 import ThemeArtwork from '../components/themes/ThemeArtwork.astro';
-import { countWord, formatDate, getCurrentCompetition, registrationOpenText, registrationOpensText } from '../lib/competitions';
+import { countWord, formatDate, getCurrentCompetition, ordinal, registrationOpenText, registrationOpensText } from '../lib/competitions';
 
 const current = await getCurrentCompetition();
 
@@ -16,6 +16,34 @@ const datePart = (date: Date, part: 'month' | 'day' | 'weekday') =>
     ...(part === 'month' ? { month: 'short' } : part === 'day' ? { day: 'numeric' } : { weekday: 'short' }),
   });
 
+// "Saturday, November 21", with the last space kept unbroken so the day number never sits alone on a line.
+const shortDate = (date: Date) =>
+  date
+    .toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' })
+    .replace(/ (\d+)$/, ' $1');
+
+// If the date has gone by but nobody has set the Stage to Past yet, treat it as finished anyway.
+const now = new Date();
+const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+const finished = Boolean(current?.date && current.date.getTime() < today);
+
+// While a Math Competition is coming up, the banner leads with its date instead of the club's slogan.
+const leadWithDate = Boolean(current?.date) && !finished;
+
+const registrationOpen = current?.stage === 'upcoming' || current?.stage === 'registration-open';
+const registerUrl = !finished && registrationOpen ? current?.registration?.formUrl : undefined;
+
+// One short line saying whether you can register yet, shown in the banner and in the "Next stop" card.
+const stageText = (() => {
+  if (!current || finished) return undefined;
+  if (current.stage === 'upcoming') return current.registration && registrationOpensText(current.registration);
+  if (current.stage === 'registration-open')
+    return current.registration ? registrationOpenText(current.registration) : 'Registration is open.';
+  if (current.stage === 'registration-closed')
+    return current.walkIns ? 'Online registration is closed. Walk-ins are welcome on the day.' : 'Online registration is closed.';
+  return undefined;
+})();
+
 // Don't name the Beneficiary until the Club Adviser and the Beneficiary have agreed.
 const beneficiaryText = current?.beneficiary
   ? current.beneficiary.confirmed
@@ -23,7 +51,22 @@ const beneficiaryText = current?.beneficiary
     : 'a local youth charity'
   : undefined;
 
-const rounds = ['Sprint', 'Target', 'Team', 'Countdown'];
+const paymentText = {
+  'school-payment': 'paid through BASIS Chandler',
+  'direct-donation': `donated straight to ${beneficiaryText ?? 'the Beneficiary'}`,
+};
+
+const mapUrl = current?.location
+  ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.location)}`
+  : undefined;
+
+// A kid-friendly line for each Round. Drafted from the usual MATHCOUNTS format: check with the club before launch.
+const rounds = [
+  { name: 'Sprint', about: 'Lots of quick problems, on your own.' },
+  { name: 'Target', about: 'A few harder problems, two at a time.' },
+  { name: 'Team', about: 'Solve problems together with your team.' },
+  { name: 'Countdown', about: 'A fast, head-to-head buzzer round.' },
+];
 const divisions = current?.divisions ?? [];
 ---
 
@@ -33,17 +76,46 @@ const divisions = current?.divisions ?? [];
     <div class="container hero-inner">
       <div class="hero-text">
         <p class="eyebrow">A student club at BASIS Chandler</p>
-        <h1>Find your route to <span class="highlight">success</span>. <PlaceholderTag /></h1>
-        <p class="lead">We run a yearly Math Competition for students, and take part in events across our school community.</p>
+        {
+          leadWithDate && current?.date ? (
+            <>
+              <h1>
+                Our {current.edition && `${ordinal(current.edition)} `}Math Competition is{' '}
+                <span class="highlight">{shortDate(current.date)}</span>.
+              </h1>
+              <p class="lead">
+                We're students at BASIS Chandler, and we run it for {current.grades?.toLowerCase() ?? 'younger students'} at
+                our school{current.coHost && `, together with ${current.coHost}`}.
+                {beneficiaryText && ` Entry Fees support ${beneficiaryText}.`}
+              </p>
+            </>
+          ) : (
+            <>
+              <h1>
+                Find your route to <span class="highlight">success</span>.
+              </h1>
+              <p class="lead">
+                We're students at BASIS Chandler. Every year we run a Math Competition for younger students at our
+                school, and we take part in events across our school community.
+              </p>
+            </>
+          )
+        }
+        {leadWithDate && stageText && <p class="status">{stageText}</p>}
         <div class="actions">
           {
-            current && (
+            registerUrl ? (
+              <a class="button" href={registerUrl}>
+                Register now <span aria-hidden="true">→</span>
+              </a>
+            ) : (
               <a class="button" href="/math-competition">
-                {current.year} Math Competition <span aria-hidden="true">→</span>
+                {current && !finished ? `${current.year} Math Competition` : 'About the Math Competition'}{' '}
+                <span aria-hidden="true">→</span>
               </a>
             )
           }
-          <a class="button secondary" href="/sponsors">Become a Sponsor</a>
+          <a class="text-link" href="/sponsors">Become a Sponsor <span aria-hidden="true">→</span></a>
         </div>
       </div>
 
@@ -63,7 +135,7 @@ const divisions = current?.divisions ?? [];
             <circle class="stop" cx="170" cy="200" r="9" />
             <circle class="stop" cx="220" cy="90" r="9" />
             <path class="star" d="M352 18C355 42 364 51 388 54 364 57 355 66 352 90 349 66 340 57 316 54 340 51 349 42 352 18Z" />
-            </svg>
+          </svg>
         )
       }
     </div>
@@ -75,87 +147,159 @@ const divisions = current?.divisions ?? [];
         <div class="container">
           <div class="card competition">
             {current.date && (
-              <div class="calendar" aria-hidden="true">
-                <span class="cal-month">{datePart(current.date, 'month')}</span>
-                <span class="cal-day">{datePart(current.date, 'day')}</span>
-                <span class="cal-weekday">{datePart(current.date, 'weekday')}</span>
+              <div class="calendar" role="img" aria-label={formatDate(current.date)}>
+                <span class="cal-month" aria-hidden="true">{datePart(current.date, 'month')}</span>
+                <span class="cal-day" aria-hidden="true">{datePart(current.date, 'day')}</span>
+                <span class="cal-weekday" aria-hidden="true">{datePart(current.date, 'weekday')}</span>
               </div>
             )}
 
             <div class="competition-text">
-              <p class="eyebrow">Next stop</p>
+              <p class="eyebrow">{finished ? 'Last stop' : 'Next stop'}</p>
               <h2 id="competition-heading">{current.year} Math Competition</h2>
-              {current.theme.name && <p class="theme">Theme: {current.theme.name}</p>}
-              {current.date && (
-                <p class="date">
-                  {formatDate(current.date)}
-                  <span class="countdown" data-date={current.date.toISOString().slice(0, 10)} />
+              {current.theme.name && (
+                <p class="theme">
+                  <Sparkle size="1.1rem" />
+                  <span>
+                    Theme: <span class="nowrap">{current.theme.name}</span>
+                  </span>
                 </p>
               )}
-              {current.location && <p>{current.location}</p>}
-              {current.entryFee !== undefined && <p>Entry Fee: ${current.entryFee} per Competitor.</p>}
-
-              {current.stage === 'upcoming' && current.registration && (
-                <p>{registrationOpensText(current.registration)}</p>
+              {current.date && (
+                !finished && (
+                  <p class="countdown-line">
+                    <span class="countdown" data-date={current.date.toISOString().slice(0, 10)} />
+                  </p>
+                )
               )}
 
-              {current.stage === 'registration-open' && current.registration && (
-                <p>{registrationOpenText(current.registration)}</p>
-              )}
+              {/* Whether you can register yet. The script below swaps in the finished message once the date has gone by. */}
+              <div class="stage-note">
+                {stageText && (
+                  <p data-stage-status hidden={finished}>
+                    {stageText}
+                    {current.stage === 'upcoming' && ' The registration link will be here as soon as it opens.'}
+                    {current.stage === 'registration-open' && !registerUrl && ' The registration link will be here very soon.'}
+                  </p>
+                )}
+                <p data-finished hidden={!finished}>
+                  This Math Competition has finished. Thank you to everyone who took part!
+                </p>
+              </div>
 
-              {(current.stage === 'upcoming' || current.stage === 'registration-open') &&
-                (current.registration?.formUrl ? (
-                  <a class="button" href={current.registration.formUrl}>
+              <dl class="facts-list">
+                {current.time && (
+                  <div>
+                    <dt>Time</dt>
+                    <dd>{current.time}</dd>
+                  </div>
+                )}
+                <div>
+                  <dt>Who can enter</dt>
+                  <dd>BASIS Chandler students{current.grades && `, ${current.grades.toLowerCase()}`}</dd>
+                </div>
+                {current.location && (
+                  <div>
+                    <dt>Where</dt>
+                    <dd>
+                      BASIS Chandler, <a href={mapUrl}>{current.location}</a>
+                    </dd>
+                  </div>
+                )}
+                {current.entryFee !== undefined && (
+                  <div>
+                    <dt>Entry Fee</dt>
+                    <dd>
+                      ${current.entryFee} per Competitor{current.paymentMethod && `, ${paymentText[current.paymentMethod]}`}
+                    </dd>
+                  </div>
+                )}
+                {beneficiaryText && (
+                  <div>
+                    <dt>Entry Fees support</dt>
+                    <dd>{beneficiaryText}</dd>
+                  </div>
+                )}
+              </dl>
+
+              <div class="card-actions">
+                {registerUrl && (
+                  <a class="button" href={registerUrl} data-stage-status>
                     Register now <span aria-hidden="true">→</span>
                   </a>
-                ) : (
-                  <p class="link-soon">Registration link coming soon</p>
-                ))}
-
-              {current.stage === 'registration-closed' && (
-                <p>
-                  Online registration is closed.
-                  {current.walkIns && current.date && ` Walk-ins are welcome on ${formatDate(current.date)}.`}
-                </p>
-              )}
-
-              {beneficiaryText && <p>Entry Fees support {beneficiaryText}.</p>}
+                )}
+                <a class:list={['button', { secondary: registerUrl }]} href="/math-competition">
+                  Details, Rounds &amp; Divisions <span aria-hidden="true">→</span>
+                </a>
+                <a class="text-link" href="mailto:contact@bcroutetosuccess.com">
+                  Questions? Email <span class="nowrap">contact@bcroutetosuccess.com</span>
+                </a>
+              </div>
             </div>
-
           </div>
         </div>
       </section>
     )
   }
 
+  <section class="section route-so-far" aria-labelledby="route-heading">
+    <div class="container">
+      <p class="eyebrow">Our route so far</p>
+      <h2 id="route-heading">Every year is a new stop.</h2>
+      <RouteTimeline
+        nextYear={current && !finished ? current.year : undefined}
+        nextDate={current?.date && !finished ? shortDate(current.date) : undefined}
+      />
+      <a class="more" href="/math-competition/past">
+        Past Math Competitions <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  </section>
+
   <section class:list={['section', 'how-it-works', { themed }]} aria-labelledby="how-heading">
     <div class="container">
       <p class="eyebrow">The Math Competition</p>
       <h2 id="how-heading">
-        Four Rounds. {countWord(divisions.length)} Divisions. One big day. <PlaceholderTag />
+        {
+          divisions.length > 0
+            ? `Four Rounds. ${countWord(divisions.length)} Divisions. One big day.`
+            : 'Four Rounds, grouped by grade. One big day.'
+        }
       </h2>
+      <p class="band-lead">A friendly, themed day out, and a great first math contest for younger students.</p>
       <div class="facts">
         <div class="card fact">
-          <span class="fact-number">4</span>
+          <span class="fact-number" aria-hidden="true">4</span>
           <h3>Rounds</h3>
-          <ul class="chips">{rounds.map((round) => <li>{round}</li>)}</ul>
-        </div>
-        <div class="card fact">
-          <span class="fact-number">{divisions.length}</span>
-          <h3>Divisions</h3>
-          <p>
-            Competitors are grouped by grade, so everyone competes against students of a similar age. <PlaceholderTag />
-          </p>
-          <ul class="chips">
+          <ul class="round-list">
             {
-              divisions.map((division) => (
+              rounds.map((round) => (
                 <li>
-                  {division.name}
-                  {division.grades && <span class="chip-detail"> · {division.grades}</span>}
+                  <span class="round-name">{round.name}</span>
+                  <span>{round.about}</span>
                 </li>
               ))
             }
           </ul>
+        </div>
+        <div class="card fact">
+          {divisions.length > 0 && <span class="fact-number" aria-hidden="true">{divisions.length}</span>}
+          <h3>Divisions</h3>
+          <p>
+            Competitors are grouped by grade, so everyone competes against students of a similar age.
+          </p>
+          {
+            divisions.length > 0 && (
+              <ul class="chips">
+                {divisions.map((division) => (
+                  <li>
+                    {division.name}
+                    {division.grades && <span class="chip-detail"> · {division.grades}</span>}
+                  </li>
+                ))}
+              </ul>
+            )
+          }
         </div>
       </div>
       <a class="more" href="/math-competition#rounds-and-divisions">
@@ -167,18 +311,18 @@ const divisions = current?.divisions ?? [];
   <section class="section get-involved" aria-labelledby="involved-heading">
     <div class="container">
       <p class="eyebrow">Get involved</p>
-      <h2 id="involved-heading">Help more students find their route. <PlaceholderTag /></h2>
+      <h2 id="involved-heading">Help more students find their route.</h2>
       <div class="involve-grid">
-        <a class="card involve" href="/sponsors">
+        <a class="card involve" href="mailto:contact@bcroutetosuccess.com?subject=Sponsoring%20the%20Math%20Competition">
           <Sparkle size="2rem" />
           <h3>Sponsor the Math Competition</h3>
-          <p>Support the club and get recognised by the families who take part. <PlaceholderTag /></p>
-          <span class="involve-link">Become a Sponsor <span aria-hidden="true">→</span></span>
+          <p>Help us run the Math Competition. Get in touch and we'll send you our Sponsorship Prospectus.</p>
+          <span class="involve-link">Email us about sponsoring <span aria-hidden="true">→</span></span>
         </a>
         <a class="card involve" href="/events">
           <Sparkle size="2rem" />
           <h3>See our Events</h3>
-          <p>Find out what else the club runs and takes part in at BASIS Chandler. <PlaceholderTag /></p>
+          <p>Find out what else the club runs and takes part in at BASIS Chandler.</p>
           <span class="involve-link">Explore Events <span aria-hidden="true">→</span></span>
         </a>
       </div>
@@ -188,6 +332,7 @@ const divisions = current?.divisions ?? [];
 
 <script>
   // Shows "N days to go" next to the competition date, counted in the visitor's own calendar.
+  // Once the date has gone by, the "Next stop" card says the Math Competition has finished, even before the site is rebuilt.
   document.querySelectorAll<HTMLElement>('.countdown').forEach((element) => {
     const [year, month, day] = (element.dataset.date ?? '').split('-').map(Number);
     const now = new Date();
@@ -197,6 +342,11 @@ const divisions = current?.divisions ?? [];
     if (days > 1) element.textContent = `${days} days to go`;
     else if (days === 1) element.textContent = 'Tomorrow!';
     else if (days === 0) element.textContent = 'Today!';
+    else {
+      const card = element.closest('.competition');
+      card?.querySelectorAll<HTMLElement>('[data-stage-status]').forEach((status) => (status.hidden = true));
+      card?.querySelector<HTMLElement>('[data-finished]')?.removeAttribute('hidden');
+    }
   });
 </script>
 
@@ -207,7 +357,8 @@ const divisions = current?.divisions ?? [];
     overflow: hidden;
   }
 
-  /* On the Theme artwork: white text, with the dark offset shadow used on the Math Competition page. */
+  /* On the Theme artwork: white text, with the dark offset shadow used on the Math Competition page.
+     The eyebrow and lead get it too, so they stay readable where they cross the artwork. */
   .hero.themed {
     color: var(--paper);
     border-bottom: 0;
@@ -221,9 +372,56 @@ const divisions = current?.divisions ?? [];
     text-shadow: 0.05em 0.05em 0 var(--ink);
   }
 
-  /* The yellow highlighter stroke doesn't work behind white text, so the word turns yellow instead. */
+  /* The lead and eyebrow sit on plain blue (or the wash on phones), so they don't need a shadow; the link near the coral does. */
+  .hero.themed .text-link {
+    text-shadow: 0.06em 0.06em 0 var(--ink);
+  }
+
+  /* The ink focus ring disappears on the Theme's blue, so it turns highlighter yellow there, as in the footer. */
+  .hero.themed :focus-visible,
+  .how-it-works.themed :focus-visible {
+    outline-color: var(--sun);
+  }
+
+  /* Registration status, as a white pill that reads clearly over the artwork. */
+  .status {
+    display: inline-block;
+    margin: 1.25rem 0 0;
+    padding: 0.3rem 0.9rem;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: var(--paper);
+    color: var(--ink);
+    font-weight: 700;
+    text-shadow: none;
+  }
+
+  /* On phones the artwork sits behind the words, so a wash of the Theme's blue keeps them readable,
+     clearing towards the bottom so the coral still shows. */
+  @media (max-width: 51.99rem) {
+    .hero.themed::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: linear-gradient(
+        color-mix(in srgb, var(--accent) 70%, transparent) 0%,
+        color-mix(in srgb, var(--accent) 60%, transparent) 70%,
+        color-mix(in srgb, var(--accent) 40%, transparent) 88%,
+        transparent 100%
+      );
+      pointer-events: none;
+    }
+
+    .hero.themed .hero-inner {
+      z-index: 1;
+    }
+  }
+
+  /* The yellow highlighter stroke doesn't work behind white text, so the words turn yellow instead. */
   .hero.themed .highlight {
     background: none;
+    padding-inline: 0;
     color: var(--sun);
   }
 
@@ -232,18 +430,31 @@ const divisions = current?.divisions ?? [];
     display: grid;
     gap: 1rem;
     align-items: center;
-    padding-block: 3rem 3.5rem;
+    padding-block: 2.5rem 3rem;
   }
 
   .hero h1 {
     margin: 0 0 1rem;
   }
 
+  .hero .lead {
+    margin: 0;
+  }
+
   .actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem 1rem;
+    align-items: center;
+    gap: 0.5rem 1.5rem;
     margin-top: 1.75rem;
+  }
+
+  /* A plain underlined link, tall enough to tap, for the quieter action next to a button. */
+  .text-link {
+    display: inline-block;
+    padding-block: 0.6rem;
+    font-weight: 700;
+    text-decoration-thickness: 2px;
   }
 
   .hero-route {
@@ -303,7 +514,7 @@ const divisions = current?.divisions ?? [];
 
   /* Room for the wave at the bottom of the Theme artwork. */
   .hero.themed .hero-inner {
-    padding-bottom: 5rem;
+    padding-bottom: 4.5rem;
   }
 
   @media (min-width: 52rem) {
@@ -316,19 +527,24 @@ const divisions = current?.divisions ?? [];
       padding-bottom: 7rem;
     }
 
+    /* Keep the lead in the open water, clear of the artwork on the right. */
+    .hero.themed .lead {
+      max-width: 30rem;
+    }
+
     .hero-route {
       max-width: 26rem;
     }
   }
 
   .competition {
-    display: grid;
-    gap: 1.5rem;
     border-top: 0.75rem solid var(--accent);
   }
 
+  /* On phones the calendar sits beside the heading instead of taking a row of its own. */
   .calendar {
-    align-self: start;
+    float: right;
+    margin: 0 0 1rem 1rem;
     display: grid;
     justify-items: center;
     align-content: start;
@@ -370,32 +586,115 @@ const divisions = current?.divisions ?? [];
     margin: 0.25rem 0 0.75rem;
   }
 
+  /* The Theme is the part young Competitors get most excited about, so it isn't muted. */
   .theme {
-    color: var(--ink-muted);
-  }
-
-  .date {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem 0.75rem;
-    font-size: 1.25rem;
+    gap: 0.4rem;
     font-weight: 700;
   }
 
+  .theme :global(.sparkle) {
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: 0.3em;
+    color: var(--accent);
+  }
+
+  .nowrap {
+    white-space: nowrap;
+  }
+
+  .countdown-line:has(.countdown:empty) {
+    display: none;
+  }
+
   .countdown:not(:empty) {
+    display: inline-block;
+    font-weight: 700;
     padding: 0.15rem 0.7rem;
     border-radius: 999px;
     background: var(--sun);
     font-size: 0.9375rem;
   }
 
+  /* The facts a Parent needs to plan the day, in one tidy list. */
+  .facts-list {
+    display: grid;
+    gap: 0.75rem 2rem;
+    margin: 1.25rem 0;
+    padding-block: 1.25rem;
+    border-block: 2px dashed var(--club-blue);
+  }
+
+  .facts-list dt {
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .facts-list dd {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  /* The map link wraps like text but is still tall enough to tap. */
+  .facts-list dd a {
+    display: inline-block;
+    padding-block: 0.6rem;
+    margin-block: -0.6rem;
+  }
+
+  /* Whether you can register yet: the one thing a Parent checks first, so it gets its own soft blue note. */
+  .stage-note p {
+    margin: 1rem 0 0;
+    padding: 0.75rem 1rem;
+    border-radius: 0.6rem;
+    background: var(--club-blue-soft);
+    font-weight: 600;
+  }
+
+  /* Buttons set their own display, which would otherwise win over the hidden attribute. */
+  .competition [hidden] {
+    display: none;
+  }
+
+  .card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+  }
+
+  @media (min-width: 40rem) {
+    .facts-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
   @media (min-width: 52rem) {
     .competition {
+      display: grid;
       grid-template-columns: auto 1fr;
       column-gap: 2rem;
       padding: 2rem;
     }
+
+    .calendar {
+      float: none;
+      align-self: start;
+      margin: 0;
+    }
+  }
+
+  .route-so-far {
+    border-top: 2px solid var(--ink);
+  }
+
+  .route-so-far h2 {
+    margin: 0 0 2.5rem;
   }
 
   .how-it-works {
@@ -422,6 +721,7 @@ const divisions = current?.divisions ?? [];
   .facts {
     display: grid;
     gap: 1.5rem;
+    align-items: start;
   }
 
   @media (min-width: 44rem) {
@@ -449,17 +749,27 @@ const divisions = current?.divisions ?? [];
     max-width: 22rem;
   }
 
-  /* A big numeral tucked into the corner of the card. */
+  /* A big numeral in the corner of the card. On phones the text wraps around it instead of running behind it. */
   .fact-number {
-    position: absolute;
-    right: 1rem;
-    top: -1rem;
+    float: right;
+    margin: -0.75rem -0.25rem 0 1rem;
     font-family: var(--font-display);
-    font-size: 7rem;
+    font-size: 5rem;
     font-weight: 800;
     line-height: 1;
     color: var(--club-blue);
     opacity: 0.35;
+  }
+
+  @media (min-width: 44rem) {
+    .fact-number {
+      float: none;
+      position: absolute;
+      right: 1rem;
+      top: -1rem;
+      margin: 0;
+      font-size: 7rem;
+    }
   }
 
   .chips {
@@ -472,16 +782,43 @@ const divisions = current?.divisions ?? [];
     list-style: none;
   }
 
-  .chip-detail {
-    font-weight: 500;
+  .band-lead {
+    max-width: 38rem;
+    margin: -1rem 0 2rem;
+    font-size: 1.1875rem;
   }
 
-  .link-soon {
+  /* Each Round's name as a chip, with what happens in it alongside. */
+  /* Plain blocks, not flex or grid, so on phones only the first line wraps around the big numeral. */
+  .round-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .round-list li + li {
+    margin-top: 0.75rem;
+  }
+
+  .round-name {
     display: inline-block;
-    padding: 0.5rem 1rem;
-    border: 2px dashed var(--ink);
+    margin: 0 0.6rem 0.25rem 0;
+    padding: 0.2rem 0.8rem;
+    border: 2px solid var(--ink);
     border-radius: 999px;
+    background: var(--club-blue-soft);
     font-weight: 700;
+  }
+
+  /* Leave the corner free for the big numeral. */
+  @media (min-width: 44rem) {
+    .fact .round-list {
+      padding-right: 4.5rem;
+    }
+  }
+
+  .chip-detail {
+    font-weight: 500;
   }
 
   .chips li {
@@ -494,8 +831,13 @@ const divisions = current?.divisions ?? [];
 
   .more {
     display: inline-block;
-    margin-top: 1.75rem;
+    margin-top: 1.5rem;
+    padding-block: 0.6rem;
     font-weight: 700;
+  }
+
+  .route-so-far .more {
+    margin-top: 2rem;
   }
 
   .involve-grid {
