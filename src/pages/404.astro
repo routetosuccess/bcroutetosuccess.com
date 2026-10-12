@@ -1,0 +1,17 @@
+---
+// Shown for any address that doesn't exist. Cloudflare Pages serves this as a real 404;
+// without it, Cloudflare would show the home page for every unknown address.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+---
+
+<BaseLayout title="Page not found" description="This page doesn't exist on the Route to Success website.">
+  <PageHeader
+    title="Page not found"
+    lead="We couldn't find that page. It may have moved, or the address may be mistyped."
+    leadIsPlaceholder
+  />
+  <div class="container page-body">
+    <a class="button" href="/">Go to the home page <span aria-hidden="true">→</span></a>
+  </div>
+</BaseLayout>
