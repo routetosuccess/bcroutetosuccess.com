@@ -1,20 +1,158 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/PageHeader.astro';
-import ComingSoon from '../components/ComingSoon.astro';
+import { getCurrentCompetition } from '../lib/competitions';
+
+const current = await getCurrentCompetition();
+const sponsors = current?.sponsors ?? [];
+
+const [user, domain] = ['bc.routetosuccess', 'gmail.com'];
+const email = `${user}@${domain}`;
+const subject = encodeURIComponent('Sponsoring the Math Competition');
+
+// The packages from the Sponsorship Prospectus, biggest first.
+const packages = [
+  {
+    name: 'Diamond',
+    price: 500,
+    perks: [
+      'Logo displayed on all event flyers, posters, and digital promotions (school newsletters, social media)',
+      'Company name announced during both the opening and awards ceremonies',
+      'Recognition in a post-event thank-you social media post',
+      'Award named in honor of your company',
+      'Option to present awards to competition winners',
+      'Opportunity to provide promotional items or coupons for participant gift bags',
+    ],
+  },
+  {
+    name: 'Platinum',
+    price: 250,
+    perks: [
+      'Logo featured on event flyers and digital promotions',
+      'Company name announced during both the opening and awards ceremonies',
+      'Recognition in a post-event thank-you social media post',
+    ],
+  },
+  {
+    name: 'Gold',
+    price: 100,
+    perks: [
+      'Logo included on event flyers and digital promotions',
+      'Company name listed in the event program and on the thank-you post',
+    ],
+  },
+];
+
+const supports = [
+  'Scholarships to cover registration fees for students in financial need',
+  'Meals and snacks for all participants',
+  'Trophies, medals, and prizes for winners',
+  'Supplies and event logistics',
+  'Hosting and maintaining our competition website',
+];
 ---
 
 <BaseLayout title="Sponsors" description="Sponsor the Route to Success Math Competition.">
   <PageHeader eyebrow="Support the club" title="Sponsors" lead="Sponsors help Route to Success run the Math Competition." />
   <div class="container page-body">
+    <section id="our-sponsors">
+      <h2>{current ? `${current.year} Sponsors` : 'Our Sponsors'}</h2>
+      {
+        sponsors.length > 0 ? (
+          <ul class="sponsor-list">
+            {sponsors.map((sponsor) => (
+              <li>{sponsor.url ? <a href={sponsor.url}>{sponsor.name}</a> : sponsor.name}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>Our sponsors for this year's Math Competition will be listed here. Want to be the first?</p>
+        )
+      }
+    </section>
+
     <section>
-      <ComingSoon />
+      <h2>Why sponsor us?</h2>
+      <p>
+        Arizona is ranked 50th in education, and nearly 75% of its schools are designated Title I. Many Arizona students
+        lack equal access to enrichment outside the classroom. Route to Success is working to close that gap by creating
+        accessible, engaging math opportunities for a diverse range of students.
+      </p>
+      <p>
+        Last year we celebrated our 6th anniversary with our largest competition yet, thanks to our corporate sponsors.
+        Sponsorships let us expand programming, strengthen outreach, and improve the student experience. In 2026 we are
+        building on that momentum by reaching a more diverse group of students than ever before.
+      </p>
+    </section>
+
+    <section>
+      <h2>What your contribution supports</h2>
+      <ul class="supports">{supports.map((item) => <li>{item}</li>)}</ul>
+      <p>We welcome both monetary and in-kind support.</p>
+    </section>
+
+    <section id="packages">
+      <h2>Sponsorship packages</h2>
+      <div class="packages">
+        {
+          packages.map((tier) => (
+            <div class="card package">
+              <h3>{tier.name}</h3>
+              <p class="price">${tier.price}</p>
+              <ul>{tier.perks.map((perk) => <li>{perk}</li>)}</ul>
+            </div>
+          ))
+        }
+      </div>
+      <p>We can provide a W-9, invoice, and ACH electronic payment instructions on request.</p>
     </section>
 
     <!-- The footer's Prospectus link points here. -->
     <section id="prospectus">
       <h2>Sponsorship Prospectus</h2>
-      <ComingSoon text="The Sponsorship Prospectus is coming soon." />
+      <p>
+        Want the full details? Read the Sponsorship Prospectus, or get in touch with any questions.
+      </p>
+      <p>
+        <a class="button" href="/sponsorship-prospectus-2026-27.pdf">Read the Prospectus (PDF)</a>
+      </p>
+      <p>
+        Email: <a href={`mailto:${email}?subject=${subject}`}>{email}</a><br />
+        Instagram: <a href="https://www.instagram.com/bc.routetosuccess/">@bc.routetosuccess</a>
+      </p>
     </section>
   </div>
 </BaseLayout>
+
+<style>
+  .supports,
+  .package ul {
+    padding-left: 1.25rem;
+  }
+
+  .packages {
+    display: grid;
+    gap: 1.5rem;
+    margin-block: 1.25rem;
+  }
+
+  .package h3 {
+    margin: 0;
+  }
+
+  .price {
+    margin: 0.25rem 0 0.75rem;
+    font-size: 1.75rem;
+    font-weight: 800;
+  }
+
+  .sponsor-list {
+    padding-left: 1.25rem;
+  }
+
+  @media (min-width: 52rem) {
+    .packages {
+      grid-template-columns: repeat(3, 1fr);
+      align-items: start;
+    }
+  }
+</style>

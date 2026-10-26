@@ -7,7 +7,23 @@ import { countWord, formatDate, getCurrentCompetition, ordinal, registrationOpen
 
 const current = await getCurrentCompetition();
 
-const rounds = ['Sprint', 'Target', 'Team', 'Countdown'];
+// What happens in each Round. Drafted from the usual MATHCOUNTS format: check with the club before launch.
+const rounds = [
+  {
+    name: 'Sprint',
+    about:
+      'You work on your own through 30 questions in 50 minutes. Calculators are not allowed in this Round. Speed and accuracy both count.',
+  },
+  {
+    name: 'Target',
+    about:
+      'There are 8 questions in all, handed out in 4 pairs. You get 6 minutes for each pair, and you finish one pair before the next is handed out. This Round focuses on depth, with harder problems that take more steps. Calculators are allowed in this Round.',
+  },
+  {
+    name: 'Countdown',
+    about: 'The top scorers go head to head on a buzzer, one problem at a time, in front of everyone.',
+  },
+];
 const divisions = current?.divisions ?? [];
 
 // Don't name the Beneficiary until the Club Adviser and the Beneficiary have agreed.
@@ -44,11 +60,11 @@ const mapUrl = current?.location
               )}
             </p>
             <h1>
-              {/* Largest to smallest: Math Competition, 7th Annual, at BASIS Chandler, then the Theme. */}
+              {/* Largest to smallest: Math Competition, 7th Annual, the Theme, then at BASIS Chandler. */}
               {current.edition && <span class="edition">{ordinal(current.edition)} Annual </span>}
               <span class="event-name">Math Competition </span>
-              <span class="school">at BASIS Chandler </span>
-              {current.theme.name && <span class="theme-name">{' '}{current.theme.name}</span>}
+              {current.theme.name && <span class="theme-name">{current.theme.name} </span>}
+              <span class="school">at BASIS Chandler</span>
             </h1>
           </div>
 
@@ -91,7 +107,7 @@ const mapUrl = current?.location
 
   <div class="container page-body">
     <p class="intro lead">
-      Every year, Route to Success runs a Math Competition for students. Competitors solve problems across four Rounds,
+      Every year, Route to Success runs a Math Competition for students. Competitors solve problems across three Rounds,
       grouped into Divisions by grade.
     </p>
 
@@ -132,8 +148,18 @@ const mapUrl = current?.location
       <h2>Rounds &amp; Divisions</h2>
       <div class="facts">
         <div class="card">
-          <h3>Four Rounds</h3>
-          <ul class="chips">{rounds.map((round) => <li>{round}</li>)}</ul>
+          <h3>Three Rounds</h3>
+          <p>Every Competitor takes part in Sprint and Target. Only the top Competitors move on to Countdown.</p>
+          <ul class="round-list">
+            {
+              rounds.map((round) => (
+                <li>
+                  <span class="round-name">{round.name}</span>
+                  <span>{round.about}</span>
+                </li>
+              ))
+            }
+          </ul>
         </div>
         <div class="card">
           <h3>{countWord(divisions.length)} Divisions</h3>
@@ -233,14 +259,14 @@ const mapUrl = current?.location
     text-transform: uppercase;
   }
 
-  .school {
+  .theme-name {
     margin-top: 0.4rem;
     font-size: clamp(1.375rem, 4.5vw, 2rem);
     font-weight: 700;
     line-height: 1.1;
   }
 
-  .theme-name {
+  .school {
     margin-top: 0.75rem;
     font-size: clamp(1.125rem, 3.5vw, 1.5rem);
     font-weight: 800;
@@ -348,6 +374,32 @@ const mapUrl = current?.location
     padding: 0.5rem 1rem;
     border: 2px dashed var(--ink);
     border-radius: 999px;
+    font-weight: 700;
+  }
+
+  /* Each Round's name as a chip, with what happens in it underneath. */
+  .round-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .round-list li {
+    display: grid;
+    justify-items: start;
+    gap: 0.4rem;
+  }
+
+  .round-list li + li {
+    margin-top: 1.25rem;
+  }
+
+  .round-name {
+    margin: 0;
+    padding: 0.2rem 0.8rem;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: var(--club-blue-soft);
     font-weight: 700;
   }
 
