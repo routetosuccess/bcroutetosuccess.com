@@ -30,7 +30,7 @@ Consult the Astro docs (https://docs.astro.build) before working on related task
 
 ## Commits
 
-Aryana makes every commit and push herself. Don't run `git commit` or `git push`; leave changes uncommitted and suggest a commit message.
+Aryana has asked Claude to make commits and pushes on her behalf when she asks for them. Only commit, push, open or merge a pull request when she asks, and leave changes uncommitted otherwise. Work on a branch and open a pull request instead of committing straight to `main`, unless she says otherwise.
 
 ## Agent skills
 

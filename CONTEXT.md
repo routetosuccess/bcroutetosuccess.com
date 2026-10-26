@@ -76,7 +76,7 @@ _Avoid_: ANM
 ### The Math Competition
 
 **Round**:
-One timed section of a Math Competition: Sprint, Target, Team, or Countdown.
+One timed section of a Math Competition: Sprint, Target, or Countdown. The Team Round was part of earlier Math Competitions but is not run in 2026.
 
 **Division**:
 A grade band that groups Competitors so they compete against students of similar age (Division 1, 2, 3). Each Math Competition decides which Divisions it runs and which grades each one covers.
@@ -116,6 +116,6 @@ A Parent's consent for images of their Competitor to be published. Only people c
 - Each **Math Competition** sets its own **Entry Fee**, and is in exactly one **Stage** at a time.
 - A **Math Competition** may have a **Beneficiary**, and has its own **Theme** and its own **Sponsors**.
 - Each **Math Competition** has exactly one **Payment Method**. An **In-kind Donation** only happens with School Payment.
-- Rounds have stayed the same across Math Competitions (2024, 2025, 2026). 2024 and 2025 ran Divisions 1–3; 2026 runs only Division 1 (grades 1–2) and Division 2 (grades 3–5).
+- Rounds were the same in 2024 and 2025 (Sprint, Target, Team, Countdown); 2026 drops the Team Round. 2024 and 2025 ran Divisions 1–3; 2026 runs only Division 1 (grades 1–2) and Division 2 (grades 3–5).
 - Money raised through the club is received by BASIS Chandler's nonprofit, not by the club itself.
 - Demographics about **Competitors** are published only as totals, never in a form that could identify a child.

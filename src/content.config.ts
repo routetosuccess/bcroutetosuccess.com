@@ -15,7 +15,7 @@ const competitions = defineCollection({
     // Past competitions may not have a confirmed date.
     date: z.coerce.date().optional(),
     stage: z.enum(['upcoming', 'registration-open', 'registration-closed', 'past']),
-    // Start and end time as written on the flyer, e.g. "9 a.m. – 12:30 p.m.".
+    // Start and end time as written on the flyer, e.g. "8 a.m. – 12 p.m.".
     time: z.string().optional(),
     // Who can enter, e.g. "Grades 1–5".
     grades: z.string().optional(),

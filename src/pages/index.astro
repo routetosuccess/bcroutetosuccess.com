@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import RouteTimeline from '../components/RouteTimeline.astro';
 import Sparkle from '../components/Sparkle.astro';
 import ThemeArtwork from '../components/themes/ThemeArtwork.astro';
 import { countWord, formatDate, getCurrentCompetition, ordinal, registrationOpenText, registrationOpensText } from '../lib/competitions';
@@ -64,7 +63,6 @@ const mapUrl = current?.location
 const rounds = [
   { name: 'Sprint', about: 'Lots of quick problems, on your own.' },
   { name: 'Target', about: 'A few harder problems, two at a time.' },
-  { name: 'Team', about: 'Solve problems together with your team.' },
   { name: 'Countdown', about: 'A fast, head-to-head buzzer round.' },
 ];
 const divisions = current?.divisions ?? [];
@@ -84,9 +82,9 @@ const divisions = current?.divisions ?? [];
                 <span class="highlight">{shortDate(current.date)}</span>.
               </h1>
               <p class="lead">
-                We're students at BASIS Chandler, and we run it for {current.grades?.toLowerCase() ?? 'younger students'} at
-                our school{current.coHost && `, together with ${current.coHost}`}.
-                {beneficiaryText && ` Entry Fees support ${beneficiaryText}.`}
+                The Route to Success is a STEM empowerment club that runs and participates in numerous events
+                throughout the school year! Our current event is our annual Route to Success x Mu Alpha Theta math
+                competition. Entry fees support Homeless Youth Connection.
               </p>
             </>
           ) : (
@@ -95,8 +93,8 @@ const divisions = current?.divisions ?? [];
                 Find your route to <span class="highlight">success</span>.
               </h1>
               <p class="lead">
-                We're students at BASIS Chandler. Every year we run a Math Competition for younger students at our
-                school, and we take part in events across our school community.
+                We're students at BASIS Chandler. Every year we run a Math Competition for younger students, and we
+                take part in events across our school community.
               </p>
             </>
           )
@@ -196,7 +194,7 @@ const divisions = current?.divisions ?? [];
                 )}
                 <div>
                   <dt>Who can enter</dt>
-                  <dd>BASIS Chandler students{current.grades && `, ${current.grades.toLowerCase()}`}</dd>
+                  <dd>{current.grades ? `${current.grades}, from any school` : 'Students from any school'}</dd>
                 </div>
                 {current.location && (
                   <div>
@@ -231,8 +229,8 @@ const divisions = current?.divisions ?? [];
                 <a class:list={['button', { secondary: registerUrl }]} href="/math-competition">
                   Details, Rounds &amp; Divisions <span aria-hidden="true">→</span>
                 </a>
-                <a class="text-link" href="mailto:contact@bcroutetosuccess.com">
-                  Questions? Email <span class="nowrap">contact@bcroutetosuccess.com</span>
+                <a class="text-link" href="mailto:bc.routetosuccess@gmail.com">
+                  Questions? Email <span class="nowrap">bc.routetosuccess@gmail.com</span>
                 </a>
               </div>
             </div>
@@ -242,34 +240,20 @@ const divisions = current?.divisions ?? [];
     )
   }
 
-  <section class="section route-so-far" aria-labelledby="route-heading">
-    <div class="container">
-      <p class="eyebrow">Our route so far</p>
-      <h2 id="route-heading">Every year is a new stop.</h2>
-      <RouteTimeline
-        nextYear={current && !finished ? current.year : undefined}
-        nextDate={current?.date && !finished ? shortDate(current.date) : undefined}
-      />
-      <a class="more" href="/math-competition/past">
-        Past Math Competitions <span aria-hidden="true">→</span>
-      </a>
-    </div>
-  </section>
-
   <section class:list={['section', 'how-it-works', { themed }]} aria-labelledby="how-heading">
     <div class="container">
       <p class="eyebrow">The Math Competition</p>
       <h2 id="how-heading">
         {
           divisions.length > 0
-            ? `Four Rounds. ${countWord(divisions.length)} Divisions. One big day.`
-            : 'Four Rounds, grouped by grade. One big day.'
+            ? `Three Rounds. ${countWord(divisions.length)} Divisions. One big day.`
+            : 'Three Rounds, grouped by grade. One big day.'
         }
       </h2>
       <p class="band-lead">A friendly, themed day out, and a great first math contest for younger students.</p>
       <div class="facts">
         <div class="card fact">
-          <span class="fact-number" aria-hidden="true">4</span>
+          <span class="fact-number" aria-hidden="true">{rounds.length}</span>
           <h3>Rounds</h3>
           <ul class="round-list">
             {
@@ -313,7 +297,7 @@ const divisions = current?.divisions ?? [];
       <p class="eyebrow">Get involved</p>
       <h2 id="involved-heading">Help more students find their route.</h2>
       <div class="involve-grid">
-        <a class="card involve" href="mailto:contact@bcroutetosuccess.com?subject=Sponsoring%20the%20Math%20Competition">
+        <a class="card involve" href="mailto:bc.routetosuccess@gmail.com?subject=Sponsoring%20the%20Math%20Competition">
           <Sparkle size="2rem" />
           <h3>Sponsor the Math Competition</h3>
           <p>Help us run the Math Competition. Get in touch and we'll send you our Sponsorship Prospectus.</p>
@@ -689,14 +673,6 @@ const divisions = current?.divisions ?? [];
     }
   }
 
-  .route-so-far {
-    border-top: 2px solid var(--ink);
-  }
-
-  .route-so-far h2 {
-    margin: 0 0 2.5rem;
-  }
-
   .how-it-works {
     background: var(--club-blue-soft);
     border-block: 2px solid var(--ink);
@@ -834,10 +810,6 @@ const divisions = current?.divisions ?? [];
     margin-top: 1.5rem;
     padding-block: 0.6rem;
     font-weight: 700;
-  }
-
-  .route-so-far .more {
-    margin-top: 2rem;
   }
 
   .involve-grid {

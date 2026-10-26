@@ -3,7 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/PageHeader.astro';
 import Sparkle from '../components/Sparkle.astro';
 
-const [user, domain] = ['contact', 'bcroutetosuccess.com'];
+const [user, domain] = ['bc.routetosuccess', 'gmail.com'];
 const email = `${user}@${domain}`;
 ---
 
@@ -19,12 +19,18 @@ const email = `${user}@${domain}`;
       {/* On a narrow phone the address breaks after the @, never in the middle of a word. */}
       <span class="email-address">{user}@<wbr />{domain}</span>
     </a>
+    <a class="card email" href="https://www.instagram.com/bc.routetosuccess/">
+      <Sparkle size="2rem" />
+      <span class="email-label">Instagram</span>
+      <span class="email-address">@bc.routetosuccess</span>
+    </a>
   </div>
 </BaseLayout>
 
 <style>
   .email {
     display: inline-flex;
+    margin: 0 1rem 1rem 0;
     flex-direction: column;
     gap: 0.25rem;
     max-width: 100%;
