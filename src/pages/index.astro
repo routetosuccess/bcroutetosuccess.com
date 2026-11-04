@@ -226,8 +226,8 @@ const divisions = current?.divisions ?? [];
                     Register now <span aria-hidden="true">→</span>
                   </a>
                 )}
-                <a class:list={['button', { secondary: registerUrl }]} href="/math-competition">
-                  Details, Rounds &amp; Divisions <span aria-hidden="true">→</span>
+                <a class:list={['button', { secondary: registerUrl }]} href="/math-competition#faq">
+                  Read the FAQ <span aria-hidden="true">→</span>
                 </a>
                 <a class="text-link" href="mailto:bc.routetosuccess@gmail.com">
                   Questions? Email <span class="nowrap">bc.routetosuccess@gmail.com</span>
@@ -337,7 +337,7 @@ const divisions = current?.divisions ?? [];
 <style>
   .hero {
     position: relative;
-    border-bottom: 2px solid var(--ink);
+    border-bottom: 2px solid var(--line);
     overflow: hidden;
   }
 
@@ -372,7 +372,7 @@ const divisions = current?.divisions ?? [];
     display: inline-block;
     margin: 1.25rem 0 0;
     padding: 0.3rem 0.9rem;
-    border: 2px solid var(--ink);
+    border: 2px solid var(--line);
     border-radius: 999px;
     background: var(--paper);
     color: var(--ink);
@@ -533,7 +533,7 @@ const divisions = current?.divisions ?? [];
     justify-items: center;
     align-content: start;
     width: 6.5rem;
-    border: 2px solid var(--ink);
+    border: 2px solid var(--line);
     border-radius: 0.75rem;
     overflow: hidden;
     text-align: center;
@@ -675,12 +675,13 @@ const divisions = current?.divisions ?? [];
 
   .how-it-works {
     background: var(--club-blue-soft);
-    border-block: 2px solid var(--ink);
+    border-block: 2px solid var(--line);
   }
 
   /* The Theme's own colour, e.g. the deep blue of the Under the Sea artwork. */
   .how-it-works.themed {
     background: var(--accent);
+    border-block-color: var(--ink);
     color: var(--paper);
   }
 
@@ -780,7 +781,7 @@ const divisions = current?.divisions ?? [];
     display: inline-block;
     margin: 0 0.6rem 0.25rem 0;
     padding: 0.2rem 0.8rem;
-    border: 2px solid var(--ink);
+    border: 2px solid var(--line);
     border-radius: 999px;
     background: var(--club-blue-soft);
     font-weight: 700;
@@ -799,7 +800,7 @@ const divisions = current?.divisions ?? [];
 
   .chips li {
     padding: 0.3rem 0.9rem;
-    border: 2px solid var(--ink);
+    border: 2px solid var(--line);
     border-radius: 999px;
     background: var(--club-blue-soft);
     font-weight: 700;
@@ -833,7 +834,7 @@ const divisions = current?.divisions ?? [];
 
   .involve:hover {
     transform: translateY(-3px);
-    box-shadow: 0 0.45rem 0 var(--ink);
+    box-shadow: var(--shadow-raised);
   }
 
   .involve :global(.sparkle) {

@@ -183,7 +183,10 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
     --sun: #ffcb47;
     --accent: var(--club-blue);
     --radius: 1rem;
-    --shadow: 0 0.25rem 0 var(--ink);
+    /* Soft edges: a pale blue line and a blurred shadow, in place of dark outlines and hard offset shadows. */
+    --line: #a9c8e4;
+    --shadow: 0 2px 12px rgb(11 46 74 / 0.1);
+    --shadow-raised: 0 4px 16px rgb(11 46 74 / 0.16);
     /* Both are Raleway for now; kept separate so headings could get their own font later. */
     --font-display: var(--font-raleway);
     --font-body: var(--font-raleway);
@@ -204,6 +207,17 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 
   body {
     margin: 0;
+  }
+
+  /* Anchor links stop short of the top so the section heading isn't hidden behind the sticky menu. */
+  html {
+    scroll-padding-top: 1.5rem;
+  }
+
+  @media (min-width: 52rem) {
+    html {
+      scroll-padding-top: 6rem;
+    }
   }
 
   h1,
@@ -293,34 +307,35 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
     color: var(--paper);
     font-weight: 700;
     text-decoration: none;
-    box-shadow: 0 0.25rem 0 var(--club-blue);
+    box-shadow: var(--shadow);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
 
   .button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 0.375rem 0 var(--club-blue);
+    box-shadow: var(--shadow-raised);
   }
 
   .button:active {
     transform: translateY(2px);
-    box-shadow: 0 0.125rem 0 var(--club-blue);
+    box-shadow: 0 1px 4px rgb(11 46 74 / 0.12);
   }
 
   .button.secondary {
     background: var(--paper);
     color: var(--ink);
+    border-color: var(--line);
     box-shadow: var(--shadow);
   }
 
   .button.secondary:hover {
-    box-shadow: 0 0.375rem 0 var(--ink);
+    box-shadow: var(--shadow-raised);
   }
 
   .card {
     background: var(--paper);
     color: var(--ink);
-    border: 2px solid var(--ink);
+    border: 2px solid var(--line);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     padding: 1.5rem;
@@ -366,7 +381,7 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 
   .site-header {
     background: var(--paper);
-    border-bottom: 2px solid var(--ink);
+    border-bottom: 2px solid var(--line);
   }
 
   /* On phones the menu wraps onto two rows, which would cover too much of the screen if it stayed pinned. */
@@ -499,7 +514,7 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
       margin-top: 0.5rem;
       padding: 0.5rem;
       background: var(--paper);
-      border: 2px solid var(--ink);
+      border: 2px solid var(--line);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
     }

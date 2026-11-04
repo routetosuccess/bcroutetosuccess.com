@@ -11,7 +11,7 @@
     { "name": "Division 2", "grades": "Grades 3–5" }
   ],
   "stage": "upcoming",
-  "entryFee": 10,
+  "entryFee": 15,
   "paymentMethod": "school-payment",
   "beneficiary": {
     "name": "Homeless Youth Connection",
