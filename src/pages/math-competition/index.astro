@@ -26,6 +26,89 @@ const rounds = [
 ];
 const divisions = current?.divisions ?? [];
 
+// Answers from the 2026 Competition FAQ sheet. Each answer is a list of bullet points (a point can have sub-points).
+const faqs = [
+  {
+    q: 'Where is the competition located?',
+    a: ['BASIS Chandler (main campus, not primary): 4825 S Arizona Ave, Chandler, AZ 85248.'],
+  },
+  {
+    q: 'Can I attend even if I do not go to BASIS Chandler, or a BASIS Charter School?',
+    a: ['Yes! This event is available to everyone, regardless of what school they attend.'],
+  },
+  {
+    q: 'Can I walk in at the door without filling in registration beforehand?',
+    a: [
+      'You can walk in at the door, but you will need to complete the registration and pay the fee in order for your student to compete.',
+    ],
+  },
+  {
+    q: 'What do I need to bring?',
+    a: ['Pencils, erasers, a calculator, a water bottle, and your thinking cap!'],
+  },
+  {
+    q: 'Who do I compete with?',
+    a: ['There are 2 grade divisions: grades 1–2 and grades 3–5. You will compete with students in your division.'],
+  },
+  {
+    q: 'What is the fee for?',
+    a: [
+      'The fee goes towards donating high-demand items to Homeless Youth Connection, an organization that aims to minimize the effects of homelessness in students aged 13–21 who attend school in Arizona.',
+    ],
+  },
+  {
+    q: 'How do I buy lunch for my student?',
+    a: ['Lunch for the students is included in the registration fee, so no other action is necessary!'],
+  },
+  {
+    q: 'How will results come out?',
+    a: [
+      'Each student will be given an ID number on a name tag sticker on the day of the exam. To keep scores anonymous, we will send out the results by ID number.',
+      'If you forget your ID number, you can always email us!',
+    ],
+  },
+  {
+    q: 'What will be tested?',
+    a: [
+      'The math questions will be harder than your typical school tests! Do not worry, this is just a competition for learning and exploration.',
+    ],
+  },
+  {
+    q: 'What is the written exam format?',
+    a: [
+      {
+        text: 'There will be two testing rounds:',
+        sub: [
+          'Sprint: 30 questions, 50 minutes, no calculator.',
+          'Target: 4 sets of 2 questions, 6 minutes for each set, calculator allowed.',
+        ],
+      },
+    ],
+  },
+  {
+    q: 'How does pick up and drop off work?',
+    a: [
+      'Parents can either stay the entire time in the gym or drop their kids off at 8:00 AM after check-in.',
+      'Pick up will be around 12:00 PM, when the competition ends.',
+      'A detailed schedule will be sent in the confirmation email.',
+    ],
+  },
+  {
+    q: 'What should I do to prepare?',
+    a: [
+      "This math competition is purely to test your child's skills, so preparation isn't required. If you would really like them to prepare, we recommend looking online for competition-style questions in their grade level range.",
+    ],
+    link: { href: '/sample-questions-2025.pdf', text: "Some sample questions from a past year's exam can be found here." },
+  },
+  {
+    q: 'Where is the 6–8 division/team round?',
+    a: [
+      'This year, the competition no longer serves 6th–8th graders, and is one round shorter.',
+      "This competition has gone through many changes in its lifetime, all made with our participants' best interests at heart. Our club prioritizes quality in everything we do, and this year we made the decision to host a smaller competition in order to maintain that quality. Despite this sad news, we hope everyone will check back next year to see which divisions are available then!",
+    ],
+  },
+];
+
 // Don't name the Beneficiary until the Club Adviser and the Beneficiary have agreed.
 const beneficiaryText = current?.beneficiary
   ? current.beneficiary.confirmed
@@ -183,12 +266,49 @@ const mapUrl = current?.location
 
     <section id="sample-questions">
       <h2>Sample Questions</h2>
-      <ComingSoon text="Sample questions are coming soon." />
+      <p>
+        Try some questions from a past exam. They may not reflect the overall difficulty of the tests.
+      </p>
+      <a class="button" href="/sample-questions-2025.pdf">
+        Sample Questions (PDF) <span aria-hidden="true">→</span>
+      </a>
     </section>
 
     <section id="faq">
       <h2>FAQ</h2>
-      <ComingSoon text="Answers to common questions are coming soon." />
+      <p class="faq-intro">
+        Have another question? Email us at <a href="mailto:bc.routetosuccess@gmail.com">bc.routetosuccess@gmail.com</a>.
+      </p>
+      <div class="faq-list">
+        {
+          faqs.map((faq) => (
+            <details class="card faq-item">
+              <summary>{faq.q}</summary>
+              <ul>
+                {faq.a.map((point) =>
+                  typeof point === 'string' ? (
+                    <li>{point}</li>
+                  ) : (
+                    <li>
+                      {point.text}
+                      <ul>
+                        {point.sub.map((sub) => (
+                          <li>{sub}</li>
+                        ))}
+                      </ul>
+                    </li>
+                  ),
+                )}
+                {faq.link && (
+                  <li>
+                    <a href={faq.link.href}>{faq.link.text}</a>
+                  </li>
+                )}
+              </ul>
+            </details>
+          ))
+        }
+      </div>
     </section>
 
     <section>
@@ -203,7 +323,7 @@ const mapUrl = current?.location
   .competition-hero {
     position: relative;
     background: var(--club-blue-soft);
-    border-bottom: 2px solid var(--ink);
+    border-bottom: 2px solid var(--line);
   }
 
   .hero-inner {
@@ -368,11 +488,44 @@ const mapUrl = current?.location
     font-weight: 500;
   }
 
+  .faq-intro {
+    margin: 0 0 1rem;
+  }
+
+  .faq-list {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  /* Squarer than the other cards, with less padding. */
+  .faq-item {
+    border-radius: 0.5rem;
+    padding: 1.1rem 1.5rem;
+  }
+
+  .faq-item summary {
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  .faq-item ul {
+    margin: 0.75rem 0 0;
+    padding-left: 1.5rem;
+  }
+
+  .faq-item li + li {
+    margin-top: 0.4rem;
+  }
+
+  .faq-item li ul {
+    margin-top: 0.4rem;
+  }
+
   .link-soon {
     display: inline-block;
     margin-top: 0.25rem;
     padding: 0.5rem 1rem;
-    border: 2px dashed var(--ink);
+    border: 2px dashed var(--line);
     border-radius: 999px;
     font-weight: 700;
   }
@@ -397,7 +550,7 @@ const mapUrl = current?.location
   .round-name {
     margin: 0;
     padding: 0.2rem 0.8rem;
-    border: 2px solid var(--ink);
+    border: 2px solid var(--line);
     border-radius: 999px;
     background: var(--club-blue-soft);
     font-weight: 700;
@@ -405,7 +558,7 @@ const mapUrl = current?.location
 
   .chips li {
     padding: 0.3rem 0.9rem;
-    border: 2px solid var(--ink);
+    border: 2px solid var(--line);
     border-radius: 999px;
     background: var(--club-blue-soft);
     font-weight: 700;
