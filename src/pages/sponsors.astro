@@ -54,7 +54,7 @@ const supports = [
 
 <BaseLayout title="Sponsors" description="Sponsor the Route to Success Math Competition.">
   <PageHeader eyebrow="Support the club" title="Sponsors" lead="Sponsors help Route to Success run the Math Competition." />
-  <div class="container page-body route-stops">
+  <div class="container page-body">
     <section id="our-sponsors">
       <h2>{current ? `${current.year} Sponsors` : 'Our Sponsors'}</h2>
       {
@@ -73,8 +73,7 @@ const supports = [
     <section>
       <h2>Why sponsor us?</h2>
       <p>
-        Arizona is ranked <span class="highlight">50th in education</span>, and{' '}
-        <span class="highlight">nearly 75% of its schools</span> are designated Title I. Many Arizona students
+        Arizona is ranked 50th in education, and nearly 75% of its schools are designated Title I. Many Arizona students
         lack equal access to enrichment outside the classroom. Route to Success is working to close that gap by creating
         accessible, engaging math opportunities for a diverse range of students.
       </p>
@@ -95,13 +94,10 @@ const supports = [
       <h2>Sponsorship packages</h2>
       <div class="packages">
         {
-          packages.map((tier, index) => (
-            <div class:list={['card', 'package', { featured: index === 0 }]}>
+          packages.map((tier) => (
+            <div class="card package">
               <h3>{tier.name}</h3>
-              <p class="price">
-                <span class="currency">$</span>
-                {tier.price}
-              </p>
+              <p class="price">${tier.price}</p>
               <ul>{tier.perks.map((perk) => <li>{perk}</li>)}</ul>
             </div>
           ))
@@ -117,9 +113,7 @@ const supports = [
         Want the full details? Read the Sponsorship Prospectus, or get in touch with any questions.
       </p>
       <p>
-        <a class="button" href="/sponsorship-prospectus-2026-27.pdf">
-          Read the Prospectus (PDF) <span aria-hidden="true">→</span>
-        </a>
+        <a class="button" href="/sponsorship-prospectus-2026-27.pdf">Read the Prospectus (PDF)</a>
       </p>
       <p>
         Email: <a href={`mailto:${email}?subject=${subject}`}>{email}</a><br />
@@ -141,39 +135,14 @@ const supports = [
     margin-block: 1.25rem;
   }
 
-  /* The tier name as a label, the price as the big number, like the Fact Cards' numerals. */
   .package h3 {
     margin: 0;
-    font-size: 0.875rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--ink-muted);
   }
 
   .price {
-    margin: 0.1rem 0 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px dashed var(--club-blue);
-    font-family: var(--font-display);
-    font-size: clamp(2.75rem, 7vw, 3.5rem);
+    margin: 0.25rem 0 0.75rem;
+    font-size: 1.75rem;
     font-weight: 800;
-    line-height: 1;
-    letter-spacing: -0.03em;
-  }
-
-  .currency {
-    font-size: 0.5em;
-    vertical-align: 0.75em;
-    margin-right: 0.05em;
-  }
-
-  .package li + li {
-    margin-top: 0.4rem;
-  }
-
-  /* The top tier gets the same thick accent edge as the competition card. */
-  .package.featured {
-    border-top: 0.75rem solid var(--accent);
   }
 
   .sponsor-list {

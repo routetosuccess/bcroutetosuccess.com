@@ -7,7 +7,6 @@ colors:
   navy-ink: "#0b2e4a"
   ink-muted: "#3d5a70"
   paper: "#ffffff"
-  line: "#a9c8e4"
   highlighter-yellow: "#ffcb47"
 typography:
   display:
@@ -16,18 +15,6 @@ typography:
     fontWeight: 800
     lineHeight: 1.1
     letterSpacing: "-0.02em"
-  page-title:
-    fontFamily: "Raleway, system-ui, sans-serif"
-    fontSize: "clamp(2.5rem, 9vw, 4.75rem)"
-    fontWeight: 800
-    lineHeight: 1.02
-    letterSpacing: "-0.03em"
-  price:
-    fontFamily: "Raleway, system-ui, sans-serif"
-    fontSize: "clamp(2.75rem, 7vw, 3.5rem)"
-    fontWeight: 800
-    lineHeight: 1
-    letterSpacing: "-0.03em"
   headline:
     fontFamily: "Raleway, system-ui, sans-serif"
     fontSize: "clamp(1.625rem, 5vw, 2.25rem)"
@@ -149,16 +136,15 @@ components:
 
 **Creative North Star: "The Route Map"**
 
-The club's name is the metaphor. Every page is a stop on a route that starts with a single dot and ends at a star: the home page draws that route as a marching dotted line, the competition card is labelled "Next stop", and the footer signs off with "Every route starts with a first step." The map is drawn on a student's maths paper: soft blue graph-paper banners, navy ink outlines like the hand-drawn logo on everything you can press, and a yellow highlighter on the words that matter most.
+The club's name is the metaphor. Every page is a stop on a route that starts with a single dot and ends at a star: the home page draws that route as a marching dotted line, the competition card is labelled "Next stop", and the footer signs off with "Every route starts with a first step." The map is drawn on a student's maths paper: soft blue graph-paper banners, navy ink outlines like the hand-drawn logo, and a yellow highlighter on the words that matter most.
 
-The mood is bright, friendly and hand-made. The site speaks first to Parents of children aged 6 to 11, so it is cheerful and welcoming, but it stays tidy and exact enough that a Sponsor reads it as a real, organised club. It is a light, single-scheme site (`color-scheme: light`) with generous spacing, one typeface, inked buttons and chips, and softer paper cards that sit gently on the page.
+The mood is bright, friendly and hand-made. The site speaks first to Parents of children aged 6 to 11, so it is cheerful and welcoming, but it stays tidy and exact enough that a Sponsor reads it as a real, organised club. It is a light, single-scheme site (`color-scheme: light`) with generous spacing, one typeface, and chunky outlined shapes that look inked rather than rendered.
 
 Each year's Math Competition can add a Theme on top: one accent colour and one piece of artwork, used in the home page banner, the Rounds section and the Math Competition page. The Theme is a layer; the club's own look stays underneath it and returns on every other page.
 
 **Key Characteristics:**
-- Navy ink outlines (2px) on everything you can press or that works as a tag: buttons, chips, the status pill and the calendar tile.
-- Containers (cards, the header, the dropdown menu, band edges) use a pale blue Line instead, so the page feels lighter.
-- A soft, low shadow lifts cards and buttons off the page.
+- Navy ink outlines (2px) on almost everything you can see or press.
+- Flat surfaces lifted by solid, unblurred offset shadows, like stickers.
 - Pills for anything small and clickable; 1rem rounded corners for cards.
 - Graph paper behind banners; a highlighter stroke behind key words.
 - The four-pointed Sparkle from the logo as the only decorative icon.
@@ -170,17 +156,16 @@ Each year's Math Competition can add a Theme on top: one accent colour and one p
 A small, high-contrast palette: one blue from the logo, one navy ink for text and outlines, one highlighter yellow for emphasis, and white paper.
 
 ### Primary
-- **Club Blue** (`club-blue`): taken from the club logo. Used for the current-page nav pill, graph-paper lines, dashed dividers, the footer's top band and headings, and the Sparkle. It is the default `--accent` when no Theme is set.
+- **Club Blue** (`club-blue`): taken from the club logo. Used for the current-page nav pill, graph-paper lines, dashed dividers, the footer's top band and headings, the Sparkle, and the coloured offset shadow under primary buttons. It is the default `--accent` when no Theme is set.
 
 ### Secondary
 - **Highlighter Yellow** (`highlighter-yellow`): the stop you're at and the words that matter most. Used for the highlighter stroke behind a key word, the star at the end of the route, the "N days to go" countdown pill, and the Sparkle and focus ring in the navy footer.
 
 ### Neutral
-- **Navy Ink** (`navy-ink`): black ink with a navy tint, like the hand-drawn logo. All body text, the outlines on buttons and chips, primary button fill, the footer background, and (at low opacity) the tint of every shadow.
+- **Navy Ink** (`navy-ink`): black ink with a navy tint, like the hand-drawn logo. All body text, every outline and offset shadow, primary button fill, and the footer background.
 - **Ink Muted** (`ink-muted`): secondary text such as eyebrow labels, weekdays and "coming soon" notes.
 - **Club Blue Soft** (`club-blue-soft`): graph-paper ground, chips, nav hover, the Rounds band, and footer body text on navy.
 - **Paper** (`paper`): page and card background; text on navy and on Theme artwork.
-- **Line** (`--line`, `#a9c8e4`): a pale Club Blue for the edges of containers: cards, the header rule, the dropdown menu and band edges. At 1.7:1 on white it is too faint to be the only sign that something can be pressed, so it never goes on buttons or chips.
 
 ### Theme accent
 A Math Competition's Theme colour comes from its data file (`theme.color` in `src/content/competitions/`) and is set as `--accent` on the page body. It colours the thick top edge of the competition card and, when the Theme has artwork, the background of the Rounds band. For 2026 (Under the Sea) it is the exact blue of the artwork's water, so the picture's edges disappear into it.
@@ -198,7 +183,7 @@ A Math Competition's Theme colour comes from its data file (`theme.color` in `sr
 **Character:** One friendly geometric sans at two very different weights: 800 for headings that look confident and chunky, 400 for easy body text. Headings and body have separate CSS variables (`--font-display`, `--font-body`) so headings could get their own font later. Fonts are downloaded at build time and served from the site's own domain.
 
 ### Hierarchy
-- **Display** (800, `clamp(2.25rem, 8vw, 4rem)`, 1.1): the home hero's h1. Page headers go bigger: `clamp(2.5rem, 9vw, 4.75rem)`, line height 1.02, tracking -0.03em. Balanced wrapping, slightly tight tracking (-0.02em).
+- **Display** (800, `clamp(2.25rem, 8vw, 4rem)`, 1.1): page titles (h1) in the hero and page headers. Balanced wrapping, slightly tight tracking (-0.02em).
 - **Headline** (800, `clamp(1.625rem, 5vw, 2.25rem)`, 1.1): section headings (h2), usually capped near 36rem wide.
 - **Title** (700, 1.25rem, 1.1): card headings (h3). Event cards use 1.5rem.
 - **Lead** (400, 1.1875rem, 1.6): the intro sentence under a page title, max 38rem wide.
@@ -218,7 +203,7 @@ The Math Competition page's hero has its own stacked title in several sizes: the
 
 ## Layout
 
-Phones come first. Content sits in a single centred container, at most 68rem wide with a 1rem side gutter. Pages are a stack of full-width bands (hero, competition card, Rounds band, get-involved) separated by 2px Line rules or dashed blue lines (a Theme-coloured band keeps a navy edge, because a pale line glows against deep blue), each with 3.5rem of vertical padding. Inner pages use a graph-paper page header, then a page body with 2.5rem above and 4rem below, and 2.5rem between sections.
+Phones come first. Content sits in a single centred container, at most 68rem wide with a 1rem side gutter. Pages are a stack of full-width bands (hero, competition card, Rounds band, get-involved) separated by 2px navy rules or dashed blue lines, each with 3.5rem of vertical padding. Inner pages use a graph-paper page header, then a page body with 2.5rem above and 4rem below, and 2.5rem between sections.
 
 Grids of cards use a 1.5rem gap. There are two breakpoints:
 - **44rem:** fact and get-involved cards go from one column to two.
@@ -226,30 +211,27 @@ Grids of cards use a 1.5rem gap. There are two breakpoints:
 
 Everything you can tap (nav links, footer links, text links next to buttons) is at least 44px tall, even when the visible text is small.
 
-The header is deliberately not sticky on phones, because the wrapped menu would cover too much of the screen. In-page links stop 6rem short of their target on wide screens (1.5rem on phones) so the sticky header doesn't cover the section heading.
+The header is deliberately not sticky on phones, because the wrapped menu would cover too much of the screen. Anchor targets leave 7rem of scroll margin for the sticky header.
 
 ## Elevation & Depth
 
-Depth is soft and low. Cards and buttons sit on a gentle shadow tinted with Navy Ink, so they lift off the page without looking heavy. Shadows still mean something: they mark what is a card or a button, and pressable things rise on hover and press down on click.
+The site is flat. Depth comes only from solid, unblurred offset shadows straight down, like a sticker lifted off the page, plus navy outlines. There are no soft shadows, glows or blurs. Shadows are structural (they mark what is a card or a button) and also respond to touch: pressable things rise on hover and press down on click.
 
 ### Shadow Vocabulary
-- **Rest** (`--shadow`: `0 2px 12px rgb(11 46 74 / 0.1)`): cards, buttons and the dropdown menu.
-- **Raised** (`--shadow-raised`: `0 4px 16px rgb(11 46 74 / 0.16)`): button hover (with a 2px rise) and linked cards on hover (3px rise).
-- **Pressed** (`0 1px 4px rgb(11 46 74 / 0.12)`): a primary button on click, moving down 2px.
-- **Ink text shadow** (`text-shadow: 0.05em 0.05em 0 var(--ink)`): white headings set on Theme artwork. This is the one solid, unblurred shadow left, because it keeps big white letters readable over the picture.
+- **Sticker** (`box-shadow: 0 0.25rem 0 var(--ink)`): cards, secondary buttons, and the dropdown menu at rest.
+- **Sticker lifted** (`box-shadow: 0 0.375rem 0 var(--ink)` with a 2px rise): secondary button hover. Linked cards rise 3px to a `0 0.45rem 0` shadow.
+- **Blue sticker** (`box-shadow: 0 0.25rem 0 var(--club-blue)`): primary buttons, so the navy fill still shows an edge. It lifts to 0.375rem on hover and presses to 0.125rem (moving down 2px) on click.
+- **Ink text shadow** (`text-shadow: 0.05em 0.05em 0 var(--ink)`): white headings set on Theme artwork.
 
 ### Named Rules
-**The Soft Lift Rule.** Box shadows are always the soft, navy-tinted ones above. No hard offset shadows, coloured glows or zero-offset halos.
-
-**The Inked Edge Rule.** Anything you can press, and anything that works as a tag, gets a 2px Navy Ink outline. Containers get the pale Line. A pale edge alone must never be the only sign that something is a button.
+**The No Blur Rule.** Every shadow has zero blur and zero spread. A soft drop shadow breaks the hand-inked look.
 
 ## Shapes
 
-Inked outlines and rounded, friendly shapes. Pressable and tag-like things have a 2px Navy Ink edge; containers have a 2px Line edge. Small, pressable or tag-like things are full pills (999px): buttons, chips, nav links, the countdown and role tags. Containers are 1rem rounded cards. Small inner pieces use smaller curves: 0.6rem for dropdown items, 0.75rem for the calendar tile, 0.25rem for focus rings.
+Inked outlines and rounded, friendly shapes. Almost every visible edge is a 2px Navy Ink line. Small, pressable or tag-like things are full pills (999px): buttons, chips, nav links, the countdown and role tags. Containers are 1rem rounded cards. Small inner pieces use smaller curves: 0.6rem for dropdown items, 0.75rem for the calendar tile, 0.25rem for focus rings.
 
 Line style carries meaning:
-- **Solid 2px Navy Ink** for things you press or read as a tag: buttons, chips, the status pill, the calendar tile.
-- **Solid 2px Line** for containers: cards, the header rule, the dropdown menu, band edges.
+- **Solid 2px Navy Ink** for finished structure: cards, buttons, the header rule, band edges.
 - **Dashed** for softer edges and things still on the way: the dashed Club Blue line under page headers and above the footer fine print, the dashed Club Blue box around "coming soon" notes, and the dashed navy pill for "Registration link coming soon".
 - **Thick colour edges** for emphasis: a 0.75rem `--accent` top edge on the competition card and a 0.5rem Club Blue top band on the footer.
 
@@ -260,10 +242,10 @@ The route itself is a round-capped dotted stroke that marches along slowly, with
 ### Buttons
 Chunky, inked and pressable.
 - **Shape:** full pill (999px) with a 2px Navy Ink border.
-- **Primary:** Navy Ink fill, Paper text, weight 700, padding 0.8rem 1.4rem, Rest shadow. A trailing "→" arrow (hidden from screen readers) on buttons that go somewhere.
-- **Hover / Active:** rises 2px to the Raised shadow; on click it drops 2px to the Pressed shadow. Transitions are 0.15s ease.
-- **Secondary:** Paper fill, Navy Ink text and the same 2px Navy Ink border, with the Rest shadow.
-- **Text link:** the quieter action next to a button ("Questions? Email …", "More about Rounds & Divisions →"): weight 700, a 2px underline, padded to a 44px tap height. A screen shows at most one filled primary button per group.
+- **Primary:** Navy Ink fill, Paper text, weight 700, padding 0.8rem 1.4rem, Blue sticker shadow. A trailing "→" arrow (hidden from screen readers) on buttons that go somewhere.
+- **Hover / Active:** rises 2px with a deeper shadow; on click it drops 2px with a thinner shadow. Transitions are 0.15s ease.
+- **Secondary:** Paper fill and Navy Ink text with the navy Sticker shadow.
+- **Text link:** the quieter action next to a button ("Become a Sponsor →", "Questions? Contact us"): weight 700, a 2px underline, padded to a 44px tap height. A screen shows at most one filled primary button per group.
 - **Focus:** the site-wide 3px Navy Ink outline, offset 3px. It turns Highlighter Yellow anywhere the background is dark or Theme-coloured (the footer, the themed hero and the themed Rounds band), where navy would disappear.
 
 ### Chips
@@ -274,42 +256,27 @@ Chunky, inked and pressable.
 ### Cards / Containers
 - **Corner Style:** 1rem.
 - **Background:** Paper, with Navy Ink text, even on coloured bands.
-- **Shadow Strategy:** Rest shadow; linked cards rise to Raised on hover (see Elevation & Depth).
-- **Border:** 2px Line.
+- **Shadow Strategy:** Sticker at rest; linked cards lift on hover (see Elevation & Depth).
+- **Border:** 2px Navy Ink.
 - **Internal Padding:** 1.5rem, or 2rem for the competition card on wide screens.
 
 ### Navigation
-- **Header:** white with a 2px Line bottom rule; logo on the left, links on the right, wrapping on phones.
+- **Header:** white with a 2px navy bottom rule; logo on the left, links on the right, wrapping on phones.
 - **Links:** pill-shaped, weight 600 at 0.9375rem. Hover fills Club Blue Soft; the current page fills Club Blue with navy text.
 - **Dropdown:** "Other Events" shows a caret and, from 52rem up, opens a card-styled menu on hover or keyboard focus. Escape closes it, `aria-expanded` reports its state, and inside the menu the focus ring is drawn inside each link so it never meets the menu's border. On phones the menu is hidden and the Events page carries the same links.
 - **Footer:** Navy Ink with a Club Blue top band, a large white tagline led by a yellow Sparkle, link groups headed in Club Blue, and dashed-divided fine print.
 
 ### Page Header
-The graph-paper banner at the top of every page except home: an optional eyebrow, the big page title followed by a small Club Blue Sparkle in superscript, an optional lead, and a dashed Club Blue line underneath. From 52rem the Route Illustration (without the maths symbols) sits in an 18rem column on the right and draws itself on load.
+The graph-paper banner at the top of every page except home: an optional eyebrow, the Display title followed by a small Club Blue Sparkle in superscript, an optional lead, and a dashed Club Blue line underneath.
 
 ### Route Illustration (signature)
-`src/components/RouteDrawing.astro`. Used in the home hero when no Theme artwork is showing, and in every page header. On page load the route draws itself from the start dot to the star (1.6s ease-out, a clip-path reveal), the star pops in as the route reaches it, then the route keeps marching. This is the site's one big entrance. A dotted navy route that marches from a Club Blue start dot past two white stops to a yellow star that gently twinkles, with faded maths symbols (π, √, +, ×, ∑) in the background. Decorative and hidden from screen readers.
-
-### Route Stops (signature)
-Long inner pages (Math Competition, Sponsors) are drawn as the route: add `class="route-stops"` to the page body. From 44rem each `<section>` gets a stop beside its heading (a 1.5rem white dot in a 3px navy ring), joined to the next by a 4px dotted line at 45% navy. The first stop is Club Blue and the last is the yellow four-pointed star. Phones skip it to keep the full width for content.
-
-### Route Connectors (signature)
-`src/components/RouteConnector.astro`. On the home page, stretches of dotted route join the sections in a zig-zag: from a white stop on one side to a Club Blue stop on the other, and the last one ends at the yellow star just above the footer. In browsers with scroll-driven animations each stretch draws itself as you scroll to it and its end marker pops in; elsewhere it is simply shown whole.
-
-### Division Picker
-`src/components/DivisionPicker.tsx` (React). "Which Division is my child in?": one chip-style button per grade (2px Navy Ink, pill, at least 44px tall, Club Blue fill when picked), and a sentence underneath naming the Division with the highlighter stroke. It reads the Divisions from the Math Competition's data file and sits under the Division chips on the home page and the Math Competition page.
-
-### Past Competitions
-The Route Timeline ("Our route so far"), then one card per Past Math Competition: the year as a big number in the Theme accent, its edition ("6th Math Competition"), its Theme, how its Entry Fees reached the Beneficiary, and a sample questions button when there is one.
-
-### Sponsorship Packages
-Tier name as an uppercase Label, then the price as a big display number (up to 3.5rem, a half-size raised "$"), a dashed Club Blue rule, then the perks. The top tier gets the competition card's 0.75rem `--accent` top edge.
+The home hero's drawing when no Theme artwork is showing: a dotted navy route that marches from a Club Blue start dot past two white stops to a yellow star that gently twinkles, with faded maths symbols (π, √, +, ×, ∑) in the background. Decorative and hidden from screen readers.
 
 ### Calendar Tile (signature)
 A 6.5rem tear-off calendar page next to the competition details (floated beside the heading on phones, its own column from 52rem). It is the card's only date, so it is labelled for screen readers with the full date: Club Blue month strip in uppercase, a big 800-weight day number, and the weekday in Ink Muted, all in a 2px navy rounded frame.
 
 ### Fact Card (signature)
-A card with a huge (7rem) Club Blue numeral faded to 35% and tucked into the top-right corner behind the text, used for the number of Rounds and the number of Divisions.
+A card with a huge (7rem) Club Blue numeral faded to 35% and tucked into the top-right corner behind the text, used for "4 Rounds" and the number of Divisions.
 
 ### Status Pill
 One line saying whether you can register yet ("Registration opening in November."), shown in the hero while a Math Competition is coming up: a Paper pill with a 2px Navy Ink border and weight-700 ink text, with no text shadow, so it reads clearly over Theme artwork. The same sentence opens the "Next stop" card as a Stage Note: a Club Blue Soft box (0.6rem corners, weight 600) above the Facts List, because it is the first thing a Parent checks.
@@ -324,13 +291,12 @@ The club's history drawn as the route: a Club Blue start dot ("Where it started"
 Stands in for unwritten pages and sections so no menu link leads nowhere: a dashed Club Blue rounded box with a Sparkle and a muted sentence.
 
 ### Theme Banner
-When the current Math Competition's Theme has artwork, the hero switches to that artwork on the Theme colour, with white text, the ink text shadow on the headline and on the text link that sits near the artwork (body-size text on plain blue or the phone wash goes without, so the letters stay crisp), the highlighted word in yellow text instead of a highlighter stroke, and a wavy white shore at the bottom. A few bubbles (white rings with a soft highlight, 0.45–1.3rem) drift up from the coral over 8–14s, wobbling slightly and fading near the top; they stop under reduced motion. On phones the artwork fills the banner at 45% opacity; from 52rem it sits on the right at full strength, fading into the water on its left edge, and the lead is kept to 30rem so it stays in the open water. Below 52rem a wash of the Theme colour (82% fading to clear near the bottom) sits over the artwork and under the words, keeping the lead at body-text contrast while the coral still shows along the shore.
+When the current Math Competition's Theme has artwork, the hero switches to that artwork on the Theme colour, with white text, the ink text shadow on the headline and on the text link that sits near the artwork (body-size text on plain blue or the phone wash goes without, so the letters stay crisp), the highlighted word in yellow text instead of a highlighter stroke, and a wavy white shore at the bottom. On phones the artwork fills the banner at 45% opacity; from 52rem it sits on the right at full strength, fading into the water on its left edge, and the lead is kept to 30rem so it stays in the open water. Below 52rem a wash of the Theme colour (70% fading to clear near the bottom) sits over the artwork and under the words, keeping the lead at body-text contrast while the coral still shows along the shore.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** outline buttons, chips and tags in 2px Navy Ink, and edge cards and other containers with the 2px Line.
-- **Do** use the soft Rest and Raised shadows for depth.
+- **Do** outline cards, buttons and chips in 2px Navy Ink and give them a solid offset shadow with no blur.
 - **Do** use full pills (999px) for buttons, chips, nav links and small tags, and 1rem corners for cards.
 - **Do** keep text Navy Ink on Club Blue, Club Blue Soft and Highlighter Yellow.
 - **Do** put graph paper behind banners and page headers, and a highlighter stroke behind no more than one key word in a heading.
@@ -341,8 +307,7 @@ When the current Math Competition's Theme has artwork, the hero switches to that
 
 ### Don't:
 - **Don't** put white text on Club Blue.
-- **Don't** use hard offset box shadows, coloured glows, or gradients other than the graph-paper grid, the highlighter stroke and the Theme wash.
-- **Don't** put the pale Line on a button or chip; it is too faint to show that something can be pressed.
+- **Don't** use soft, blurred or coloured-glow shadows, or gradients other than the graph-paper grid and the highlighter stroke.
 - **Don't** fill a section or large area with Highlighter Yellow.
 - **Don't** add a second typeface by hard-coding it; change `--font-display` if headings ever get their own font.
 - **Don't** let a Theme replace the club's look on pages beyond the home banner, the Rounds band and the Math Competition page.

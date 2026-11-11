@@ -3,17 +3,6 @@
 // Fills its parent, which must be position: relative. Purely decorative, so it's hidden from screen readers.
 import { Image } from 'astro:assets';
 import art from '../../assets/themes/under-the-sea.webp';
-
-// A few bubbles drifting up through the water: where they start (from the left), how big, and how long they take.
-const bubbles = [
-  { left: 58, size: 0.9, duration: 11, delay: 0 },
-  { left: 66, size: 0.5, duration: 9, delay: 3 },
-  { left: 74, size: 1.3, duration: 14, delay: 1.5 },
-  { left: 81, size: 0.6, duration: 10, delay: 6 },
-  { left: 88, size: 1, duration: 12, delay: 4 },
-  { left: 94, size: 0.45, duration: 8, delay: 2 },
-  { left: 70, size: 0.7, duration: 13, delay: 8 },
-];
 ---
 
 <div class="under-the-sea" aria-hidden="true">
@@ -26,15 +15,6 @@ const bubbles = [
     loading="eager"
     fetchpriority="high"
   />
-
-  {
-    bubbles.map((bubble) => (
-      <span
-        class="bubble"
-        style={`left: ${bubble.left}%; --size: ${bubble.size}rem; animation-duration: ${bubble.duration}s; animation-delay: -${bubble.delay}s`}
-      />
-    ))
-  }
 
   <svg class="shore" viewBox="0 0 1440 60" preserveAspectRatio="none" focusable="false">
     <path d="M0 30C200 8 400 12 620 30S1000 52 1200 34 1380 22 1440 28V60H0Z" />
@@ -69,45 +49,6 @@ const bubbles = [
       object-position: left bottom;
       opacity: 1;
       mask-image: linear-gradient(90deg, transparent, black 30%);
-    }
-  }
-
-  /* Bubbles rise from the coral to the surface, wobbling a little and fading out near the top. */
-  .bubble {
-    position: absolute;
-    bottom: 8%;
-    width: var(--size);
-    height: var(--size);
-    border: 2px solid rgb(255 255 255 / 0.7);
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.08) 60%);
-    animation: rise linear infinite;
-  }
-
-  @keyframes rise {
-    0% {
-      transform: translate(0, 0);
-      opacity: 0;
-    }
-    10% {
-      opacity: 1;
-    }
-    50% {
-      transform: translate(0.75rem, -40vh);
-    }
-    90% {
-      opacity: 0.8;
-    }
-    100% {
-      transform: translate(-0.25rem, -80vh);
-      opacity: 0;
-    }
-  }
-
-  /* Without motion they'd just sit in a row, so leave them out. */
-  @media (prefers-reduced-motion: reduce) {
-    .bubble {
-      display: none;
     }
   }
 

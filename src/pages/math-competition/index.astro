@@ -2,7 +2,6 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import ComingSoon from '../../components/ComingSoon.astro';
-import DivisionPicker from '../../components/DivisionPicker';
 import ThemeArtwork from '../../components/themes/ThemeArtwork.astro';
 import { countWord, formatDate, getCurrentCompetition, ordinal, registrationOpenText, registrationOpensText } from '../../lib/competitions';
 
@@ -189,7 +188,7 @@ const mapUrl = current?.location
     )
   }
 
-  <div class="container page-body route-stops">
+  <div class="container page-body">
     <p class="intro lead">
       Every year, Route to Success runs a Math Competition for students. Competitors solve problems across three Rounds,
       grouped into Divisions by grade.
@@ -261,7 +260,6 @@ const mapUrl = current?.location
               ))
             }
           </ul>
-          <DivisionPicker client:visible divisions={divisions} />
         </div>
       </div>
     </section>
@@ -527,7 +525,7 @@ const mapUrl = current?.location
     display: inline-block;
     margin-top: 0.25rem;
     padding: 0.5rem 1rem;
-    border: 2px dashed var(--ink);
+    border: 2px dashed var(--line);
     border-radius: 999px;
     font-weight: 700;
   }
@@ -552,7 +550,7 @@ const mapUrl = current?.location
   .round-name {
     margin: 0;
     padding: 0.2rem 0.8rem;
-    border: 2px solid var(--ink);
+    border: 2px solid var(--line);
     border-radius: 999px;
     background: var(--club-blue-soft);
     font-weight: 700;
@@ -560,7 +558,7 @@ const mapUrl = current?.location
 
   .chips li {
     padding: 0.3rem 0.9rem;
-    border: 2px solid var(--ink);
+    border: 2px solid var(--line);
     border-radius: 999px;
     background: var(--club-blue-soft);
     font-weight: 700;
