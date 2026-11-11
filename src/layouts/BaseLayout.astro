@@ -324,7 +324,6 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
   .button.secondary {
     background: var(--paper);
     color: var(--ink);
-    border-color: var(--line);
     box-shadow: var(--shadow);
   }
 
@@ -351,6 +350,55 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 
   .page-body section + section {
     margin-top: 2.5rem;
+  }
+
+  /* A page drawn as the club's route: each section is a stop on a dotted line down the left,
+     starting at a Club Blue dot and ending at the yellow star. Add class="route-stops" to a page body. */
+  @media (min-width: 44rem) {
+    .route-stops > section {
+      position: relative;
+      padding-left: 3.25rem;
+    }
+
+    /* The stop: a white dot in a navy ring, level with the section heading. */
+    .route-stops > section::before {
+      content: '';
+      position: absolute;
+      z-index: 1;
+      left: 0;
+      top: 0.35rem;
+      width: 1.5rem;
+      height: 1.5rem;
+      border: 3px solid var(--ink);
+      border-radius: 50%;
+      background: var(--paper);
+    }
+
+    .route-stops > section:first-of-type::before {
+      background: var(--club-blue);
+    }
+
+    /* The last stop is the club's star. */
+    .route-stops > section:last-of-type::before {
+      top: 0;
+      left: -0.4rem;
+      width: 2.3rem;
+      height: 2.3rem;
+      border: 0;
+      border-radius: 0;
+      background: var(--sun);
+      clip-path: path('M18.4 0C19.9 12.3 24.5 16.9 36.8 18.4 24.5 19.9 19.9 24.5 18.4 36.8 16.9 24.5 12.3 19.9 0 18.4 12.3 16.9 16.9 12.3 18.4 0Z');
+    }
+
+    /* The dotted route from this stop down to the next one. */
+    .route-stops > section:not(:last-of-type)::after {
+      content: '';
+      position: absolute;
+      left: calc(0.75rem - 2px);
+      top: 2.25rem;
+      bottom: -2.25rem;
+      border-left: 4px dotted color-mix(in srgb, var(--ink) 45%, transparent);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {

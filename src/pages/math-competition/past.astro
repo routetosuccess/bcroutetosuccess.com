@@ -1,12 +1,135 @@
 ---
+// Every Math Competition the club has a data file for, drawn as the club's route and then one card per year.
+// A new year shows up here on its own once its data file's Stage is "past".
+import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import ComingSoon from '../../components/ComingSoon.astro';
+import RouteTimeline from '../../components/RouteTimeline.astro';
+import Sparkle from '../../components/Sparkle.astro';
+import { getCurrentCompetition, ordinal } from '../../lib/competitions';
+
+const current = await getCurrentCompetition();
+const competitions = (await getCollection('competitions')).map((entry) => entry.data);
+const past = competitions.filter((competition) => competition.stage === 'past').sort((a, b) => b.year - a.year);
+
+// The Math Competition runs once a year, so a year's number comes from the newest one that knows its own.
+const numbered = competitions.find((competition) => competition.edition);
+const editionOf = (year: number) =>
+  numbered?.edition ? numbered.edition - (numbered.year - year) : undefined;
+
+const nextDate = current?.date
+  ? current.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' })
+  : undefined;
+
+// Sample questions we've published from a past year's exam.
+const sampleQuestions: Record<number, string> = { 2025: '/sample-questions-2025.pdf' };
+
+const howFeesWent = (competition: (typeof competitions)[number]) => {
+  if (!competition.beneficiary?.confirmed) return undefined;
+  const name = competition.beneficiary.name;
+  if (competition.paymentMethod === 'direct-donation') return `Families donated their Entry Fees straight to ${name}.`;
+  if (competition.beneficiary.inKindDonation)
+    return `Entry Fees were collected through BASIS Chandler and given to ${name} as donated goods.`;
+  return `Entry Fees went to ${name}.`;
+};
 ---
 
 <BaseLayout title="Past Competitions" description="Past Math Competitions run by Route to Success.">
-  <PageHeader eyebrow="Math Competition" title="Past Competitions" />
+  <PageHeader
+    eyebrow="Math Competition"
+    title="Past Competitions"
+    lead="Every year has had its own Theme, and every year's Entry Fees have gone to a good cause."
+  />
   <div class="container page-body">
-    <ComingSoon text="Photos and results from past Math Competitions are coming soon." />
+    <section aria-labelledby="route-heading">
+      <h2 id="route-heading">Our route so far</h2>
+      <RouteTimeline nextYear={current?.year} nextDate={nextDate} />
+    </section>
+
+    <section aria-labelledby="years-heading">
+      <h2 id="years-heading">Year by year</h2>
+      <ol class="years">
+        {
+          past.map((competition) => (
+            <li class="card year">
+              <p class="year-number">
+                {competition.year}
+              </p>
+              <h3>
+                {editionOf(competition.year) && `${ordinal(editionOf(competition.year)!)} `}Math Competition
+              </h3>
+              {competition.theme.name && (
+                <p class="theme">
+                  <Sparkle size="1.1rem" />
+                  <span>Theme: {competition.theme.name}</span>
+                </p>
+              )}
+              {howFeesWent(competition) && <p>{howFeesWent(competition)}</p>}
+              {sampleQuestions[competition.year] && (
+                <a class="button secondary" href={sampleQuestions[competition.year]}>
+                  Try the sample questions (PDF) <span aria-hidden="true">→</span>
+                </a>
+              )}
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section>
+      <ComingSoon text="Photos and results from past Math Competitions are coming soon." />
+    </section>
   </div>
 </BaseLayout>
+
+<style>
+  .page-body h2 {
+    margin: 0 0 1.5rem;
+  }
+
+  .years {
+    display: grid;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 44rem) {
+    .years {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* The year leads each card as a big number, like the prices on the Sponsors page. */
+  .year-number {
+    margin: 0 0 0.25rem !important;
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 7vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--accent);
+  }
+
+  .year h3 {
+    margin: 0 0 0.5rem;
+  }
+
+  .year p {
+    margin: 0 0 1rem;
+  }
+
+  .theme {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 700;
+  }
+
+  .theme :global(.sparkle) {
+    flex-shrink: 0;
+    color: var(--club-blue);
+  }
+</style>
