@@ -50,7 +50,7 @@ The site leads with four things that together no tutoring centre or outside cont
 - The Club Adviser approves what the site says about BASIS Chandler and how it uses the school's name.
 - The Beneficiary is named only after the Club Adviser and the Beneficiary both confirm; until then the site says "a local youth charity".
 - Amounts raised and other totals are published only when the school has confirmed them. Demographics appear only as totals.
-- Not yet decided: the 2026 registration opening and closing dates (registration opens in November), the registration form link, and whether Walk-ins are allowed.
+- Not yet decided: the 2026 registration closing date.
 
 ## Brand Commitments
 
