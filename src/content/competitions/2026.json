@@ -10,7 +10,7 @@
     { "name": "Division 1", "grades": "Grades 1–2" },
     { "name": "Division 2", "grades": "Grades 3–5" }
   ],
-  "stage": "upcoming",
+  "stage": "registration-open",
   "entryFee": 15,
   "paymentMethod": "school-payment",
   "beneficiary": {
@@ -24,7 +24,7 @@
   },
   "walkIns": true,
   "registration": {
-    "opensIn": "November"
+    "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSeKH4HA0TamxNHiLSWKMJ_RGAyG12ra0KR59ZBYu4yCnnB95g/viewform"
   },
   "sponsors": []
 }
