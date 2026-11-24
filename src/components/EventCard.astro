@@ -10,6 +10,9 @@ interface Props {
     date?: Date;
     role?: 'runs' | 'takes-part';
     summary?: string;
+    time?: string;
+    location?: string;
+    link?: { url: string; text: string };
   };
   // Main Events are their own section, so their name is a section heading; smaller ones sit one level down.
   headingLevel?: 'h2' | 'h3';
@@ -24,8 +27,18 @@ const roleLabel = { runs: 'Run by the club', 'takes-part': 'The club takes part'
   <Sparkle size="2rem" />
   <Heading>{event.name}</Heading>
   {event.role && <p class="role">{roleLabel[event.role]}</p>}
-  <p class="date">{event.date ? formatDate(event.date) : 'Date to be announced'}</p>
+  <p class="date">
+    {event.date ? formatDate(event.date) : 'Date to be announced'}{event.time && `, ${event.time}`}
+  </p>
+  {event.location && <p>{event.location}</p>}
   <p>{event.summary ?? 'More details coming soon.'}</p>
+  {
+    event.link && (
+      <a class="button" href={event.link.url}>
+        {event.link.text} <span aria-hidden="true">→</span>
+      </a>
+    )
+  }
 </article>
 
 <style>
@@ -63,5 +76,10 @@ const roleLabel = { runs: 'Run by the club', 'takes-part': 'The club takes part'
 
   .date {
     font-weight: 700;
+  }
+
+  .button {
+    align-self: flex-start;
+    margin-top: 0.5rem;
   }
 </style>

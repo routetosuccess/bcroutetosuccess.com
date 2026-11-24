@@ -2,6 +2,17 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
+// A Theme layered on top of the club's look, for a Math Competition or a big Event.
+const theme = z
+  .object({
+    name: z.string().optional(),
+    // Accent colour layered on top of the club's light blue. With artwork, use the artwork's main colour.
+    color: z.string().optional(),
+    // Which set of artwork in src/components/themes/ to draw.
+    artwork: z.enum(['under-the-sea']).optional(),
+  })
+  .default({});
+
 // One JSON file per Math Competition in src/content/competitions/, named by year (2026.json).
 // Terms like Stage, Payment Method and Walk-in are defined in CONTEXT.md.
 const competitions = defineCollection({
@@ -41,15 +52,7 @@ const competitions = defineCollection({
         inKindDonation: z.boolean().default(false),
       })
       .optional(),
-    theme: z
-      .object({
-        name: z.string().optional(),
-        // Accent colour layered on top of the club's light blue. With artwork, use the artwork's main colour.
-        color: z.string().optional(),
-        // Which set of artwork in src/components/themes/ to draw on the Math Competition page.
-        artwork: z.enum(['under-the-sea']).optional(),
-      })
-      .default({}),
+    theme,
     // Left out until the club decides whether this competition accepts Walk-ins.
     walkIns: z.boolean().optional(),
     registration: z
@@ -73,12 +76,26 @@ const competitions = defineCollection({
         }),
       )
       .default([]),
+    // Results PDFs in public/, one per Division. They list Competitor ID numbers and scores only, never names.
+    results: z
+      .array(
+        z.object({
+          // Matches a name in divisions, e.g. "Division 1".
+          division: z.string(),
+          file: z.string(),
+        }),
+      )
+      .default([]),
     // Totals only, confirmed by the school. Never anything that identifies a child.
     totals: z
       .object({
         competitors: z.number().int().optional(),
+        // When the club gives a rounded count, e.g. "50+": shows as "50+ Competitors".
+        competitorsPlus: z.boolean().default(false),
         schools: z.number().int().optional(),
         raised: z.number().optional(),
+        // When the club only knows a floor, e.g. "over $750": shows as "Over $750 raised".
+        raisedOver: z.boolean().default(false),
       })
       .optional(),
   }),
@@ -96,7 +113,20 @@ const events = defineCollection({
     // A sentence or two about the Event, approved by the club.
     summary: z.string().optional(),
     // Smaller Events are grouped together under "Smaller Events" instead of getting their own section and menu link.
+    // Every other Event is a big Event, which the home page can feature once it has a date.
     smaller: z.boolean().default(false),
+    // e.g. "6 – 9 p.m.".
+    time: z.string().optional(),
+    location: z.string().optional(),
+    // Where to send people: tickets, a sign-up form or more information.
+    link: z
+      .object({
+        url: z.string().url(),
+        // The button's words, e.g. "Get tickets".
+        text: z.string(),
+      })
+      .optional(),
+    theme,
   }),
 });
 

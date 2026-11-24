@@ -1,0 +1,127 @@
+---
+// How a Past Math Competition went: its results PDFs first, then its totals and where the Entry Fees went.
+// Used on the Math Competition page until the next Math Competition is added, then on the year's archive page.
+import { formatCompetitors, formatDollars, howFeesWent, type Competition } from '../lib/competitions';
+
+interface Props {
+  competition: Competition;
+}
+
+const { competition } = Astro.props;
+const totals = competition.totals;
+// Where the Entry Fees went, unless the amount raised already names the Beneficiary.
+const fees = totals?.raised === undefined ? howFeesWent(competition) : undefined;
+
+// e.g. "50+ Competitors", "Over $750 raised for Homeless Youth Connection".
+const totalsText = [
+  totals?.competitors !== undefined && `${formatCompetitors(totals)} competitors`,
+  totals?.schools !== undefined && `${totals.schools} ${totals.schools === 1 ? 'school' : 'schools'}`,
+  totals?.raised !== undefined &&
+    `${totals.raisedOver ? 'Over ' : ''}${formatDollars(totals.raised)} raised${
+      competition.beneficiary?.confirmed ? ` for ${competition.beneficiary.name}` : ''
+    }`,
+].filter((text): text is string => Boolean(text));
+---
+
+{
+  competition.results.length > 0 && (
+    <>
+      <p>Find your competitor ID number to see your scores in each round.</p>
+      <ul class="results">
+        {competition.results.map((result) => {
+          const grades = competition.divisions.find((division) => division.name === result.division)?.grades;
+          return (
+            <li>
+              <a class="card result" href={result.file}>
+                <span class="division">{result.division}</span>
+                {grades && <span class="grades">{grades}</span>}
+                <span class="result-link">
+                  See the scores (PDF) <span aria-hidden="true">→</span>
+                </span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </>
+  )
+}
+{
+  (totalsText.length > 0 || fees) && (
+    <p class="totals">
+      {totalsText.map((text, i) => (
+        <>
+          {i > 0 && <span aria-hidden="true"> · </span>}
+          <strong>{text}</strong>
+        </>
+      ))}
+      {fees && (
+        <>
+          {totalsText.length > 0 && '. '}
+          {fees}
+        </>
+      )}
+    </p>
+  )
+}
+
+<style>
+  .results {
+    display: grid;
+    gap: 1rem;
+    margin: 1rem 0 1.5rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 44rem) {
+    .results {
+      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    }
+  }
+
+  .result {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    height: 100%;
+    border-top: 0.5rem solid var(--accent);
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .result:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-raised);
+  }
+
+  /* The Division leads each card in big type, like the year on the Past Competitions cards. */
+  .division {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 5vw, 2.25rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+  }
+
+  .grades {
+    font-weight: 700;
+  }
+
+  .result-link {
+    margin-top: 0.75rem;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .totals {
+    margin: 0;
+    color: var(--ink-muted);
+  }
+
+  .totals strong {
+    color: var(--ink);
+  }
+</style>
