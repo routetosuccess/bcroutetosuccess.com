@@ -1,12 +1,114 @@
 ---
+// Every Past Math Competition, one card per year linking to its archive page (or the Math Competition page, for the last one).
+// A new year shows up here on its own once its data file's Stage is "past".
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
-import ComingSoon from '../../components/ComingSoon.astro';
+import Sparkle from '../../components/Sparkle.astro';
+import {
+  editionOf,
+  getCompetitions,
+  getCompetitionUrl,
+  getPastCompetitions,
+  howFeesWent,
+  ordinal,
+} from '../../lib/competitions';
+
+const competitions = await getCompetitions();
+const past = await getPastCompetitions();
+const urlOf = await getCompetitionUrl();
 ---
 
 <BaseLayout title="Past Competitions" description="Past Math Competitions run by Route to Success.">
-  <PageHeader eyebrow="Math Competition" title="Past Competitions" />
+  <PageHeader
+    eyebrow="Math Competition"
+    title="Past Competitions"
+    lead="Every year has had its own theme, and every year's entry fees have gone to a good cause."
+  />
   <div class="container page-body">
-    <ComingSoon text="Photos and results from past Math Competitions are coming soon." />
+    <section aria-labelledby="years-heading">
+      <h2 id="years-heading">Year by year</h2>
+      <ol class="years">
+        {
+          past.map((competition) => {
+            const edition = editionOf(competition, competitions);
+            return (
+              <li class="card year">
+                <p class="year-number">{competition.year}</p>
+                <h3>
+                  <a href={urlOf(competition)}>
+                    {edition && `${ordinal(edition)} `}Math Competition
+                  </a>
+                </h3>
+                {competition.theme.name && (
+                  <p class="theme">
+                    <Sparkle size="1.1rem" />
+                    <span>Theme: {competition.theme.name}</span>
+                  </p>
+                )}
+                {howFeesWent(competition) && <p>{howFeesWent(competition)}</p>}
+                <a class="button secondary" href={urlOf(competition)} aria-hidden="true" tabindex="-1">
+                  See {competition.year} <span aria-hidden="true">→</span>
+                </a>
+              </li>
+            );
+          })
+        }
+      </ol>
+    </section>
   </div>
 </BaseLayout>
+
+<style>
+  .page-body h2 {
+    margin: 0 0 1.5rem;
+  }
+
+  .years {
+    display: grid;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 44rem) {
+    .years {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* The year leads each card as a big number, like the prices on the Sponsors page. */
+  .year-number {
+    margin: 0 0 0.25rem;
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 7vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--accent);
+  }
+
+  .year h3 {
+    margin: 0 0 0.5rem;
+  }
+
+  .year h3 a {
+    color: inherit;
+  }
+
+  .year p {
+    margin: 0 0 1rem;
+  }
+
+  .theme {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 700;
+  }
+
+  .theme :global(.sparkle) {
+    flex-shrink: 0;
+    color: var(--club-blue);
+  }
+</style>

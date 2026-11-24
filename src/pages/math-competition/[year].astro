@@ -1,0 +1,177 @@
+---
+// One archive page per Past Math Competition, e.g. /math-competition/2025, built from that year's data file.
+// The last Math Competition stays on the Math Competition page, and gets its page here once the next one is added.
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import CompetitionResults from '../../components/CompetitionResults.astro';
+import Sparkle from '../../components/Sparkle.astro';
+import {
+  editionOf,
+  formatDate,
+  getArchivedCompetitions,
+  getCompetitions,
+  getCompetitionUrl,
+  getPastCompetitions,
+  howFeesWent,
+  ordinal,
+  sampleQuestions,
+  type Competition,
+} from '../../lib/competitions';
+
+export const getStaticPaths = (async () => {
+  const archived = new Set((await getArchivedCompetitions()).map((competition) => competition.year));
+  const past = await getPastCompetitions();
+  return past.flatMap((competition, i) =>
+    archived.has(competition.year)
+      ? [
+          {
+            params: { year: String(competition.year) },
+            // The list is newest first, so the next-newer year comes before this one.
+            props: { competition, newer: past[i - 1], older: past[i + 1] },
+          },
+        ]
+      : [],
+  );
+}) satisfies GetStaticPaths;
+
+interface Props {
+  competition: Competition;
+  newer?: Competition;
+  older?: Competition;
+}
+
+const { competition, newer, older } = Astro.props;
+const competitions = await getCompetitions();
+const edition = editionOf(competition, competitions);
+const title = `${competition.year} Math Competition`;
+const urlOf = await getCompetitionUrl();
+const sample = sampleQuestions[competition.year];
+const hasDetails = Boolean(competition.date || competition.grades || competition.coHost);
+---
+
+<BaseLayout
+  title={competition.theme.name ? `${title}: ${competition.theme.name}` : title}
+  description={`The ${edition ? `${ordinal(edition)} ` : ''}Math Competition run by Route to Success at BASIS Chandler, in ${competition.year}.`}
+  accent={competition.theme.color}
+>
+  <PageHeader
+    eyebrow={edition ? `Our ${ordinal(edition)} Math Competition` : 'Past Competitions'}
+    title={title}
+    lead={competition.theme.name ? `Theme: ${competition.theme.name}` : undefined}
+  />
+  <div class="container page-body">
+    {
+      hasDetails && (
+        <dl class="card details">
+          {competition.date && (
+            <div>
+              <dt>Date</dt>
+              <dd>{formatDate(competition.date)}</dd>
+            </div>
+          )}
+          {competition.grades && (
+            <div>
+              <dt>Who could enter</dt>
+              <dd>{competition.grades}</dd>
+            </div>
+          )}
+          {competition.coHost && (
+            <div>
+              <dt>Run with</dt>
+              <dd>{competition.coHost}</dd>
+            </div>
+          )}
+        </dl>
+      )
+    }
+
+    {
+      (competition.totals || competition.results.length > 0 || howFeesWent(competition)) && (
+        <section id="results" aria-labelledby="results-heading">
+          <h2 id="results-heading">How it went</h2>
+          <CompetitionResults competition={competition} />
+        </section>
+      )
+    }
+
+    {
+      sample && (
+        <section aria-labelledby="sample-heading">
+          <h2 id="sample-heading">Try the questions</h2>
+          <p>Some questions from the {competition.year} exam, for practice.</p>
+          <a class="button" href={sample}>
+            Sample questions (PDF) <span aria-hidden="true">→</span>
+          </a>
+        </section>
+      )
+    }
+
+    <nav class="years-nav" aria-label="Other years">
+      {
+        older && (
+          <a class="button secondary" href={urlOf(older)}>
+            <span aria-hidden="true">←</span> {older.year}
+          </a>
+        )
+      }
+      <a class="button secondary" href="/math-competition/past">
+        <Sparkle size="1rem" /> All Past Competitions
+      </a>
+      {
+        newer && (
+          <a class="button secondary" href={urlOf(newer)}>
+            {newer.year} <span aria-hidden="true">→</span>
+          </a>
+        )
+      }
+    </nav>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-body > * + * {
+    margin-top: 3rem;
+  }
+
+  .page-body h2 {
+    margin: 0 0 1.25rem;
+  }
+
+  .details {
+    display: grid;
+    gap: 1.25rem;
+    margin: 0;
+  }
+
+  @media (min-width: 44rem) {
+    .details {
+      grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    }
+  }
+
+  .details dt {
+    font-weight: 700;
+    color: var(--ink-muted);
+  }
+
+  .details dd {
+    margin: 0.25rem 0 0;
+    font-weight: 700;
+  }
+
+  #results {
+    scroll-margin-top: 7rem;
+  }
+
+  .years-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 3.5rem;
+  }
+
+  .years-nav :global(.sparkle) {
+    color: var(--club-blue);
+  }
+</style>

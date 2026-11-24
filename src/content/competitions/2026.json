@@ -10,7 +10,7 @@
     { "name": "Division 1", "grades": "Grades 1–2" },
     { "name": "Division 2", "grades": "Grades 3–5" }
   ],
-  "stage": "registration-open",
+  "stage": "past",
   "entryFee": 15,
   "paymentMethod": "school-payment",
   "beneficiary": {
@@ -26,5 +26,15 @@
   "registration": {
     "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSeKH4HA0TamxNHiLSWKMJ_RGAyG12ra0KR59ZBYu4yCnnB95g/viewform"
   },
-  "sponsors": []
+  "results": [
+    { "division": "Division 1", "file": "/results-2026-division-1.pdf" },
+    { "division": "Division 2", "file": "/results-2026-division-2.pdf" }
+  ],
+  "sponsors": [],
+  "totals": {
+    "competitors": 50,
+    "competitorsPlus": true,
+    "raised": 750,
+    "raisedOver": true
+  }
 }

@@ -140,7 +140,7 @@ The club's name is the metaphor. Every page is a stop on a route that starts wit
 
 The mood is bright, friendly and hand-made. The site speaks first to Parents of children aged 6 to 11, so it is cheerful and welcoming, but it stays tidy and exact enough that a Sponsor reads it as a real, organised club. It is a light, single-scheme site (`color-scheme: light`) with generous spacing, one typeface, and chunky outlined shapes that look inked rather than rendered.
 
-Each year's Math Competition can add a Theme on top: one accent colour and one piece of artwork, used in the home page banner, the Rounds section and the Math Competition page. The Theme is a layer; the club's own look stays underneath it and returns on every other page.
+Each year's Math Competition, and each Big Event, can add a Theme on top: one accent colour and one piece of artwork. The home page banner wears the Theme of the Big Event it features (or the last Theme, if that one has none), and the Math Competition page wears the Math Competition's. The Theme is a layer; the club's own look stays underneath it and returns on every other page.
 
 **Key Characteristics:**
 - Navy ink outlines (2px) on almost everything you can see or press.
@@ -164,11 +164,11 @@ A small, high-contrast palette: one blue from the logo, one navy ink for text an
 ### Neutral
 - **Navy Ink** (`navy-ink`): black ink with a navy tint, like the hand-drawn logo. All body text, every outline and offset shadow, primary button fill, and the footer background.
 - **Ink Muted** (`ink-muted`): secondary text such as eyebrow labels, weekdays and "coming soon" notes.
-- **Club Blue Soft** (`club-blue-soft`): graph-paper ground, chips, nav hover, the Rounds band, and footer body text on navy.
+- **Club Blue Soft** (`club-blue-soft`): graph-paper ground, chips, nav hover, and footer body text on navy.
 - **Paper** (`paper`): page and card background; text on navy and on Theme artwork.
 
 ### Theme accent
-A Math Competition's Theme colour comes from its data file (`theme.color` in `src/content/competitions/`) and is set as `--accent` on the page body. It colours the thick top edge of the competition card and, when the Theme has artwork, the background of the Rounds band. For 2026 (Under the Sea) it is the exact blue of the artwork's water, so the picture's edges disappear into it.
+A Math Competition's Theme colour comes from its data file (`theme.color` in `src/content/competitions/`) and is set as `--accent` on the page body. It colours the thick top edge of the competition card. For 2026 (Under the Sea) it is the exact blue of the artwork's water, so the picture's edges disappear into it.
 
 ### Named Rules
 **The Dark Text on Light Colour Rule.** Text on Club Blue and on Highlighter Yellow is always Navy Ink. White text on Club Blue doesn't have enough contrast.
@@ -203,7 +203,7 @@ The Math Competition page's hero has its own stacked title in several sizes: the
 
 ## Layout
 
-Phones come first. Content sits in a single centred container, at most 68rem wide with a 1rem side gutter. Pages are a stack of full-width bands (hero, competition card, Rounds band, get-involved) separated by 2px navy rules or dashed blue lines, each with 3.5rem of vertical padding. Inner pages use a graph-paper page header, then a page body with 2.5rem above and 4rem below, and 2.5rem between sections.
+Phones come first. Content sits in a single centred container, at most 68rem wide with a 1rem side gutter. Pages are a stack of full-width bands (hero, competition card, get-involved) separated by 2px navy rules or dashed blue lines, each with 3.5rem of vertical padding. Inner pages use a graph-paper page header, then a page body with 2.5rem above and 4rem below, and 2.5rem between sections.
 
 Grids of cards use a 1.5rem gap. There are two breakpoints:
 - **44rem:** fact and get-involved cards go from one column to two.
@@ -246,7 +246,7 @@ Chunky, inked and pressable.
 - **Hover / Active:** rises 2px with a deeper shadow; on click it drops 2px with a thinner shadow. Transitions are 0.15s ease.
 - **Secondary:** Paper fill and Navy Ink text with the navy Sticker shadow.
 - **Text link:** the quieter action next to a button ("Become a Sponsor →", "Questions? Contact us"): weight 700, a 2px underline, padded to a 44px tap height. A screen shows at most one filled primary button per group.
-- **Focus:** the site-wide 3px Navy Ink outline, offset 3px. It turns Highlighter Yellow anywhere the background is dark or Theme-coloured (the footer, the themed hero and the themed Rounds band), where navy would disappear.
+- **Focus:** the site-wide 3px Navy Ink outline, offset 3px. It turns Highlighter Yellow anywhere the background is dark or Theme-coloured (the footer and the themed hero), where navy would disappear.
 
 ### Chips
 - **Style:** Club Blue Soft fill, 2px Navy Ink border, pill, weight 700, padding 0.3rem 0.9rem. Used for the Rounds and Divisions lists; extra detail ("· Grades 1–2") drops to weight 500.
@@ -310,5 +310,5 @@ When the current Math Competition's Theme has artwork, the hero switches to that
 - **Don't** use soft, blurred or coloured-glow shadows, or gradients other than the graph-paper grid and the highlighter stroke.
 - **Don't** fill a section or large area with Highlighter Yellow.
 - **Don't** add a second typeface by hard-coding it; change `--font-display` if headings ever get their own font.
-- **Don't** let a Theme replace the club's look on pages beyond the home banner, the Rounds band and the Math Competition page.
+- **Don't** let a Theme replace the club's look on pages beyond the home banner and the Math Competition page.
 - **Don't** show photos of people who aren't covered by a Photo Release.

@@ -2,12 +2,39 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Sparkle from '../components/Sparkle.astro';
 import ThemeArtwork from '../components/themes/ThemeArtwork.astro';
-import { countWord, formatDate, getCurrentCompetition, ordinal, registrationOpenText, registrationOpensText } from '../lib/competitions';
+import {
+  formatDate,
+  formatCompetitors,
+  formatDollars,
+  getCompetitionUrl,
+  ordinal,
+  registrationOpenText,
+  registrationOpensText,
+} from '../lib/competitions';
+import { getSpotlight, getSpotlightTheme } from '../lib/spotlight';
 
-const current = await getCurrentCompetition();
+// The home page features one big Event at a time: the Math Competition or another Event (see src/lib/spotlight.ts).
+const spotlight = await getSpotlight();
+const next = spotlight?.when === 'next';
 
-// When the current Math Competition's Theme has artwork, the home page banner and the Rounds section take on its look.
-const themed = Boolean(current?.theme.artwork);
+// A Math Competition that's coming up, or the last one, shown in the "Next stop" or "Last stop" card.
+const current = spotlight?.kind === 'competition' && next ? spotlight.competition : undefined;
+const last = spotlight?.kind === 'competition' && !next ? spotlight.competition : undefined;
+const lastRaised = last?.totals?.raised;
+// After a Math Competition, the banner's main button leads to its results.
+const lastUrl = last ? `${(await getCompetitionUrl())(last)}#results` : undefined;
+const lastResultsUrl = last && last.results.length > 0 ? lastUrl : undefined;
+
+// Another big Event, coming up or just over. Its own link (tickets, a sign-up form) only while it's coming up.
+const event = spotlight?.kind === 'event' ? spotlight.event : undefined;
+const eventLink = next ? event?.link : undefined;
+const eventUrl = event ? (eventLink?.url ?? `/events#${event.id}`) : undefined;
+const eventLinkText = event ? (eventLink?.text ?? `About the ${event.name}`) : undefined;
+
+// When the featured big Event's Theme has artwork, the home page banner takes on its look.
+// If it has no Theme, the last Theme stays.
+const theme = await getSpotlightTheme(spotlight);
+const themed = Boolean(theme?.artwork);
 
 const datePart = (date: Date, part: 'month' | 'day' | 'weekday') =>
   date.toLocaleDateString('en-US', {
@@ -26,8 +53,9 @@ const now = new Date();
 const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
 const finished = Boolean(current?.date && current.date.getTime() < today);
 
-// While a Math Competition is coming up, the banner leads with its date instead of the club's slogan.
+// While a big Event is coming up, the banner leads with its date instead of the club's slogan.
 const leadWithDate = Boolean(current?.date) && !finished;
+const eventLeadDate = next && event?.date ? event.date : undefined;
 
 const registrationOpen = current?.stage === 'upcoming' || current?.stage === 'registration-open';
 const registerUrl = !finished && registrationOpen ? current?.registration?.formUrl : undefined;
@@ -52,25 +80,18 @@ const beneficiaryText = current?.beneficiary
 
 const paymentText = {
   'school-payment': 'paid through BASIS Chandler',
-  'direct-donation': `donated straight to ${beneficiaryText ?? 'the Beneficiary'}`,
+  'direct-donation': `donated straight to ${beneficiaryText ?? 'the beneficiary'}`,
 };
 
 const mapUrl = current?.location
   ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.location)}`
   : undefined;
 
-// A kid-friendly line for each Round. Drafted from the usual MATHCOUNTS format: check with the club before launch.
-const rounds = [
-  { name: 'Sprint', about: 'Lots of quick problems, on your own.' },
-  { name: 'Target', about: 'A few harder problems, two at a time.' },
-  { name: 'Countdown', about: 'A fast, head-to-head buzzer round.' },
-];
-const divisions = current?.divisions ?? [];
 ---
 
-<BaseLayout title="Route to Success" accent={current?.theme.color}>
+<BaseLayout title="Route to Success" accent={theme?.color}>
   <section class:list={['hero', themed ? 'themed' : 'graph-paper']}>
-    {themed && <ThemeArtwork artwork={current?.theme.artwork} />}
+    {themed && <ThemeArtwork artwork={theme?.artwork} />}
     <div class="container hero-inner">
       <div class="hero-text">
         <p class="eyebrow">A student club at BASIS Chandler</p>
@@ -85,6 +106,16 @@ const divisions = current?.divisions ?? [];
                 The Route to Success is a STEM empowerment club that runs and participates in numerous events
                 throughout the school year! Our current event is our annual Route to Success x Mu Alpha Theta math
                 competition. Entry fees support Homeless Youth Connection.
+              </p>
+            </>
+          ) : eventLeadDate && event ? (
+            <>
+              <h1>
+                Our {event.name} is <span class="highlight">{shortDate(eventLeadDate)}</span>.
+              </h1>
+              <p class="lead">
+                {event.summary ??
+                  "We're students at BASIS Chandler. We run a Math Competition for younger students every year, and we take part in events across our school community."}
               </p>
             </>
           ) : (
@@ -106,14 +137,22 @@ const divisions = current?.divisions ?? [];
               <a class="button" href={registerUrl}>
                 Register now <span aria-hidden="true">→</span>
               </a>
+            ) : event ? (
+              <a class="button" href={eventUrl}>
+                {eventLinkText} <span aria-hidden="true">→</span>
+              </a>
             ) : (
-              <a class="button" href="/math-competition">
-                {current && !finished ? `${current.year} Math Competition` : 'About the Math Competition'}{' '}
+              <a class="button" href={lastResultsUrl ?? '/math-competition'}>
+                {current && !finished
+                  ? `${current.year} Math Competition`
+                  : lastResultsUrl
+                    ? `${last!.edition ? ordinal(last!.edition) : last!.year} Math Competition student scores`
+                    : 'About the Math Competition'}{' '}
                 <span aria-hidden="true">→</span>
               </a>
             )
           }
-          <a class="text-link" href="/sponsors">Become a Sponsor <span aria-hidden="true">→</span></a>
+          <a class="text-link" href="/sponsors">Become a sponsor <span aria-hidden="true">→</span></a>
         </div>
       </div>
 
@@ -206,15 +245,15 @@ const divisions = current?.divisions ?? [];
                 )}
                 {current.entryFee !== undefined && (
                   <div>
-                    <dt>Entry Fee</dt>
+                    <dt>Entry fee</dt>
                     <dd>
-                      ${current.entryFee} per Competitor{current.paymentMethod && `, ${paymentText[current.paymentMethod]}`}
+                      ${current.entryFee} per competitor{current.paymentMethod && `, ${paymentText[current.paymentMethod]}`}
                     </dd>
                   </div>
                 )}
                 {beneficiaryText && (
                   <div>
-                    <dt>Entry Fees support</dt>
+                    <dt>Entry fees support</dt>
                     <dd>{beneficiaryText}</dd>
                   </div>
                 )}
@@ -240,57 +279,147 @@ const divisions = current?.divisions ?? [];
     )
   }
 
-  <section class:list={['section', 'how-it-works', { themed }]} aria-labelledby="how-heading">
-    <div class="container">
-      <p class="eyebrow">The Math Competition</p>
-      <h2 id="how-heading">
-        {
-          divisions.length > 0
-            ? `Three Rounds. ${countWord(divisions.length)} Divisions. One big day.`
-            : 'Three Rounds, grouped by grade. One big day.'
-        }
-      </h2>
-      <p class="band-lead">A friendly, themed day out, and a great first math contest for younger students.</p>
-      <div class="facts">
-        <div class="card fact">
-          <span class="fact-number" aria-hidden="true">{rounds.length}</span>
-          <h3>Rounds</h3>
-          <ul class="round-list">
-            {
-              rounds.map((round) => (
-                <li>
-                  <span class="round-name">{round.name}</span>
-                  <span>{round.about}</span>
-                </li>
-              ))
-            }
-          </ul>
+  {
+    last && (
+      <section class="section next-stop" aria-labelledby="competition-heading">
+        <div class="container">
+          <div class="card competition last-stop">
+            <div class="competition-text">
+              <p class="eyebrow">Last stop</p>
+              <h2 id="competition-heading">{last.year} Math Competition</h2>
+              {last.theme.name && (
+                <p class="theme">
+                  <Sparkle size="1.1rem" />
+                  <span>
+                    Theme: <span class="nowrap">{last.theme.name}</span>
+                  </span>
+                </p>
+              )}
+
+              <div class="stage-note">
+                <p>Thank you to everyone who took part! Details of next year's Math Competition will be here soon.</p>
+              </div>
+
+              {(last.date || last.totals?.competitors !== undefined || lastRaised !== undefined) && (
+                <dl class="facts-list">
+                  {last.date && (
+                    <div>
+                      <dt>Date</dt>
+                      <dd>{formatDate(last.date)}</dd>
+                    </div>
+                  )}
+                  {last.totals?.competitors !== undefined && (
+                    <div>
+                      <dt>Competitors</dt>
+                      <dd>{formatCompetitors(last.totals)}</dd>
+                    </div>
+                  )}
+                  {lastRaised !== undefined && (
+                    <div>
+                      <dt>Raised</dt>
+                      <dd>
+                        {last.totals?.raisedOver ? 'Over ' : ''}
+                        {formatDollars(lastRaised)}
+                        {last.beneficiary?.confirmed && ` for ${last.beneficiary.name}`}
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+              )}
+
+              <div class="card-actions">
+                <a class="button" href={lastUrl}>
+                  See how {last.year} went <span aria-hidden="true">→</span>
+                </a>
+                <a class="button secondary" href="/math-competition/past">
+                  Past Competitions <span aria-hidden="true">→</span>
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="card fact">
-          {divisions.length > 0 && <span class="fact-number" aria-hidden="true">{divisions.length}</span>}
-          <h3>Divisions</h3>
-          <p>
-            Competitors are grouped by grade, so everyone competes against students of a similar age.
-          </p>
-          {
-            divisions.length > 0 && (
-              <ul class="chips">
-                {divisions.map((division) => (
-                  <li>
-                    {division.name}
-                    {division.grades && <span class="chip-detail"> · {division.grades}</span>}
-                  </li>
-                ))}
-              </ul>
-            )
-          }
+      </section>
+    )
+  }
+
+  {
+    event && (
+      <section class="section next-stop" aria-labelledby="competition-heading">
+        <div class="container">
+          <div class:list={['card', 'competition', { 'last-stop': !next }]}>
+            {next && event.date && (
+              <div class="calendar" role="img" aria-label={formatDate(event.date)}>
+                <span class="cal-month" aria-hidden="true">{datePart(event.date, 'month')}</span>
+                <span class="cal-day" aria-hidden="true">{datePart(event.date, 'day')}</span>
+                <span class="cal-weekday" aria-hidden="true">{datePart(event.date, 'weekday')}</span>
+              </div>
+            )}
+
+            <div class="competition-text">
+              <p class="eyebrow">{next ? 'Next stop' : 'Last stop'}</p>
+              <h2 id="competition-heading">{event.name}</h2>
+              {event.theme.name && (
+                <p class="theme">
+                  <Sparkle size="1.1rem" />
+                  <span>
+                    Theme: <span class="nowrap">{event.theme.name}</span>
+                  </span>
+                </p>
+              )}
+              {next && event.date && (
+                <p class="countdown-line">
+                  <span class="countdown" data-date={event.date.toISOString().slice(0, 10)} />
+                </p>
+              )}
+
+              <div class="stage-note">
+                {event.summary && (
+                  <p data-stage-status hidden={!next}>
+                    {event.summary}
+                  </p>
+                )}
+                <p data-finished hidden={next}>
+                  The {event.name} has finished. Thank you to everyone who came!
+                </p>
+              </div>
+
+              {(event.date || event.time || event.location) && (
+                <dl class="facts-list">
+                  {!next && event.date && (
+                    <div>
+                      <dt>Date</dt>
+                      <dd>{formatDate(event.date)}</dd>
+                    </div>
+                  )}
+                  {event.time && (
+                    <div>
+                      <dt>Time</dt>
+                      <dd>{event.time}</dd>
+                    </div>
+                  )}
+                  {event.location && (
+                    <div>
+                      <dt>Where</dt>
+                      <dd>{event.location}</dd>
+                    </div>
+                  )}
+                </dl>
+              )}
+
+              <div class="card-actions">
+                <a class="button" href={eventUrl}>
+                  {eventLinkText} <span aria-hidden="true">→</span>
+                </a>
+                <a class="button secondary" href="/events">
+                  All events <span aria-hidden="true">→</span>
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <a class="more" href="/math-competition#rounds-and-divisions">
-        More about Rounds &amp; Divisions <span aria-hidden="true">→</span>
-      </a>
-    </div>
-  </section>
+      </section>
+    )
+  }
 
   <section class="section get-involved" aria-labelledby="involved-heading">
     <div class="container">
@@ -300,14 +429,14 @@ const divisions = current?.divisions ?? [];
         <a class="card involve" href="mailto:bc.routetosuccess@gmail.com?subject=Sponsoring%20the%20Math%20Competition">
           <Sparkle size="2rem" />
           <h3>Sponsor the Math Competition</h3>
-          <p>Help us run the Math Competition. Get in touch and we'll send you our Sponsorship Prospectus.</p>
+          <p>Help us run the Math Competition. Get in touch and we'll send you our sponsorship prospectus.</p>
           <span class="involve-link">Email us about sponsoring <span aria-hidden="true">→</span></span>
         </a>
         <a class="card involve" href="/events">
           <Sparkle size="2rem" />
-          <h3>See our Events</h3>
+          <h3>See our events</h3>
           <p>Find out what else the club runs and takes part in at BASIS Chandler.</p>
-          <span class="involve-link">Explore Events <span aria-hidden="true">→</span></span>
+          <span class="involve-link">Explore events <span aria-hidden="true">→</span></span>
         </a>
       </div>
     </div>
@@ -315,8 +444,8 @@ const divisions = current?.divisions ?? [];
 </BaseLayout>
 
 <script>
-  // Shows "N days to go" next to the competition date, counted in the visitor's own calendar.
-  // Once the date has gone by, the "Next stop" card says the Math Competition has finished, even before the site is rebuilt.
+  // Shows "N days to go" next to the big Event's date, counted in the visitor's own calendar.
+  // Once the date has gone by, the "Next stop" card says it has finished, even before the site is rebuilt.
   document.querySelectorAll<HTMLElement>('.countdown').forEach((element) => {
     const [year, month, day] = (element.dataset.date ?? '').split('-').map(Number);
     const now = new Date();
@@ -362,8 +491,7 @@ const divisions = current?.divisions ?? [];
   }
 
   /* The ink focus ring disappears on the Theme's blue, so it turns highlighter yellow there, as in the footer. */
-  .hero.themed :focus-visible,
-  .how-it-works.themed :focus-visible {
+  .hero.themed :focus-visible {
     outline-color: var(--sun);
   }
 
@@ -671,146 +799,16 @@ const divisions = current?.divisions ?? [];
       align-self: start;
       margin: 0;
     }
+
+    /* The Last stop card has no calendar, so its text takes the full width. */
+    .competition.last-stop {
+      display: block;
+    }
   }
 
-  .how-it-works {
-    background: var(--club-blue-soft);
-    border-block: 2px solid var(--line);
-  }
-
-  /* The Theme's own colour, e.g. the deep blue of the Under the Sea artwork. */
-  .how-it-works.themed {
-    background: var(--accent);
-    border-block-color: var(--ink);
-    color: var(--paper);
-  }
-
-  .how-it-works.themed .eyebrow {
-    color: var(--paper);
-  }
-
-  .how-it-works h2,
   .get-involved h2 {
     margin: 0 0 2rem;
     max-width: 36rem;
-  }
-
-  .facts {
-    display: grid;
-    gap: 1.5rem;
-    align-items: start;
-  }
-
-  @media (min-width: 44rem) {
-    .facts {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  .fact {
-    position: relative;
-    overflow: hidden;
-  }
-
-  /* Keep the card's text above the big numeral. */
-  .fact > :not(.fact-number) {
-    position: relative;
-  }
-
-  .fact h3 {
-    margin: 0 0 0.75rem;
-  }
-
-  .fact p {
-    margin: 0 0 1rem;
-    max-width: 22rem;
-  }
-
-  /* A big numeral in the corner of the card. On phones the text wraps around it instead of running behind it. */
-  .fact-number {
-    float: right;
-    margin: -0.75rem -0.25rem 0 1rem;
-    font-family: var(--font-display);
-    font-size: 5rem;
-    font-weight: 800;
-    line-height: 1;
-    color: var(--club-blue);
-    opacity: 0.35;
-  }
-
-  @media (min-width: 44rem) {
-    .fact-number {
-      float: none;
-      position: absolute;
-      right: 1rem;
-      top: -1rem;
-      margin: 0;
-      font-size: 7rem;
-    }
-  }
-
-  .chips {
-    position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .band-lead {
-    max-width: 38rem;
-    margin: -1rem 0 2rem;
-    font-size: 1.1875rem;
-  }
-
-  /* Each Round's name as a chip, with what happens in it alongside. */
-  /* Plain blocks, not flex or grid, so on phones only the first line wraps around the big numeral. */
-  .round-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .round-list li + li {
-    margin-top: 0.75rem;
-  }
-
-  .round-name {
-    display: inline-block;
-    margin: 0 0.6rem 0.25rem 0;
-    padding: 0.2rem 0.8rem;
-    border: 2px solid var(--line);
-    border-radius: 999px;
-    background: var(--club-blue-soft);
-    font-weight: 700;
-  }
-
-  /* Leave the corner free for the big numeral. */
-  @media (min-width: 44rem) {
-    .fact .round-list {
-      padding-right: 4.5rem;
-    }
-  }
-
-  .chip-detail {
-    font-weight: 500;
-  }
-
-  .chips li {
-    padding: 0.3rem 0.9rem;
-    border: 2px solid var(--line);
-    border-radius: 999px;
-    background: var(--club-blue-soft);
-    font-weight: 700;
-  }
-
-  .more {
-    display: inline-block;
-    margin-top: 1.5rem;
-    padding-block: 0.6rem;
-    font-weight: 700;
   }
 
   .involve-grid {

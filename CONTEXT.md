@@ -4,6 +4,8 @@ The public website of Route to Success, a student club at BASIS Chandler. The si
 
 ## Language
 
+The terms below are capitalised here so they're easy to spot as defined terms. In the site's own sentences, buttons and labels they're written in lowercase, like ordinary words ("competitors", "entry fee", "volunteers"). They keep capitals only at the start of a sentence, in title-case headings ("Rounds & Divisions") and in names ("Division 1", "Math Competition").
+
 ### The club
 
 **Route to Success**:
@@ -34,6 +36,13 @@ _Avoid_: sponsor packet, deck
 **Event**:
 Something the club runs, or takes part in, on a specific date.
 _Avoid_: program, activity
+
+**Big Event**:
+The Math Competition, or any Event that isn't a Smaller Event. The home page features one Big Event at a time: the Math Competition while its registration is open, otherwise the soonest Big Event coming up, otherwise the one that most recently finished.
+_Avoid_: main event, featured event
+
+**Smaller Event**:
+An Event grouped with others under "Smaller Events" on the Events page, without its own section or menu link. It is never featured on the home page.
 
 **Program**:
 Something the club does on an ongoing basis, not tied to a single date.

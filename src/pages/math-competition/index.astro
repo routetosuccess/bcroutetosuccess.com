@@ -2,29 +2,44 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import ComingSoon from '../../components/ComingSoon.astro';
+import CompetitionResults from '../../components/CompetitionResults.astro';
 import ThemeArtwork from '../../components/themes/ThemeArtwork.astro';
-import { countWord, formatDate, getCurrentCompetition, ordinal, registrationOpenText, registrationOpensText } from '../../lib/competitions';
+import {
+  countWord,
+  formatDate,
+  getCurrentCompetition,
+  getPastCompetitions,
+  getCompetitionTheme,
+  ordinal,
+  registrationOpenText,
+  registrationOpensText,
+} from '../../lib/competitions';
 
 const current = await getCurrentCompetition();
+const siteTheme = await getCompetitionTheme();
+
+// Between Math Competitions, the page keeps showing the last one (its banner and Divisions) until the next is added.
+const last = current ? undefined : (await getPastCompetitions())[0];
+const shown = current ?? last;
 
 // What happens in each Round. Drafted from the usual MATHCOUNTS format: check with the club before launch.
 const rounds = [
   {
     name: 'Sprint',
     about:
-      'You work on your own through 30 questions in 50 minutes. Calculators are not allowed in this Round. Speed and accuracy both count.',
+      'You work on your own through 30 questions in 50 minutes. Calculators are not allowed in this round. Speed and accuracy both count.',
   },
   {
     name: 'Target',
     about:
-      'There are 8 questions in all, handed out in 4 pairs. You get 6 minutes for each pair, and you finish one pair before the next is handed out. This Round focuses on depth, with harder problems that take more steps. Calculators are allowed in this Round.',
+      'There are 8 questions in all, handed out in 4 pairs. You get 6 minutes for each pair, and you finish one pair before the next is handed out. This round focuses on depth, with harder problems that take more steps. Calculators are allowed in this round.',
   },
   {
     name: 'Countdown',
     about: 'The top scorers go head to head on a buzzer, one problem at a time, in front of everyone.',
   },
 ];
-const divisions = current?.divisions ?? [];
+const divisions = shown?.divisions ?? [];
 
 // Answers from the 2026 Competition FAQ sheet. Each answer is a list of bullet points (a point can have sub-points).
 const faqs = [
@@ -116,71 +131,74 @@ const beneficiaryText = current?.beneficiary
     : 'a local youth charity'
   : undefined;
 
-const mapUrl = current?.location
-  ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.location)}`
+const mapUrl = shown?.location
+  ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shown.location)}`
   : undefined;
 ---
 
 <BaseLayout
   title={current?.theme.name ? `${current.year} Math Competition: ${current.theme.name}` : 'Math Competition'}
   description="The yearly Math Competition run by Route to Success at BASIS Chandler."
-  accent={current?.theme.color}
+  accent={siteTheme?.color}
 >
   {
-    current ? (
-      <section class:list={['competition-hero', { themed: current.theme.artwork }]}>
-        <ThemeArtwork artwork={current.theme.artwork} />
+    shown ? (
+      <section class:list={['competition-hero', { themed: siteTheme?.artwork }]}>
+        <ThemeArtwork artwork={siteTheme?.artwork} />
 
         <div class="container hero-inner">
           <div class="hero-text">
             <p class="presents">
               Route to Success
-              {current.coHost && (
+              {shown.coHost && (
                 <>
                   <span class="times" aria-label="and">×</span>
-                  {current.coHost}
+                  {shown.coHost}
                 </>
               )}
             </p>
             <h1>
               {/* Largest to smallest: Math Competition, 7th Annual, the Theme, then at BASIS Chandler. */}
-              {current.edition && <span class="edition">{ordinal(current.edition)} Annual </span>}
+              {shown.edition && <span class="edition">{ordinal(shown.edition)} Annual </span>}
               <span class="event-name">Math Competition </span>
-              {current.theme.name && <span class="theme-name">{current.theme.name} </span>}
+              {shown.theme.name && <span class="theme-name">{shown.theme.name} </span>}
               <span class="school">at BASIS Chandler</span>
             </h1>
           </div>
 
-          <dl class="card details">
-            {current.date && (
-              <div>
-                <dt>When</dt>
-                <dd>{formatDate(current.date)}</dd>
-              </div>
-            )}
-            {current.time && (
-              <div>
-                <dt>Time</dt>
-                <dd>{current.time}</dd>
-              </div>
-            )}
-            {current.grades && (
-              <div>
-                <dt>Who</dt>
-                <dd>{current.grades} welcome!</dd>
-              </div>
-            )}
-            {current.location && (
-              <div>
-                <dt>Where</dt>
-                <dd>
-                  BASIS Chandler
-                  <br />
-                  <a href={mapUrl}>{current.location}</a>
-                </dd>
-              </div>
-            )}
-          </dl>
+          {/* The When, Time, Who and Where card, only while a Math Competition is coming up. */}
+          {current && (
+            <dl class="card details">
+              {shown.date && (
+                <div>
+                  <dt>When</dt>
+                  <dd>{formatDate(shown.date)}</dd>
+                </div>
+              )}
+              {shown.time && (
+                <div>
+                  <dt>Time</dt>
+                  <dd>{shown.time}</dd>
+                </div>
+              )}
+              {shown.grades && (
+                <div>
+                  <dt>Who</dt>
+                  <dd>{shown.grades} welcome!</dd>
+                </div>
+              )}
+              {shown.location && (
+                <div>
+                  <dt>Where</dt>
+                  <dd>
+                    BASIS Chandler
+                    <br />
+                    <a href={mapUrl}>{shown.location}</a>
+                  </dd>
+                </div>
+              )}
+            </dl>
+          )}
         </div>
       </section>
     ) : (
@@ -189,63 +207,76 @@ const mapUrl = current?.location
   }
 
   <div class="container page-body">
-    <p class="intro lead">
-      Every year, Route to Success runs a Math Competition for students. Competitors solve problems across three Rounds,
-      grouped into Divisions by grade.
-    </p>
+    {
+      last ? (
+        <p class="intro lead">
+          Congratulations, competitors! You worked so hard at the {last.year} Math Competition, and we're proud of every
+          one of you. Thank you to the families, volunteers{last.coHost && ` and our co-host, ${last.coHost},`} for making
+          it a wonderful day.
+        </p>
+      ) : (
+        <p class="intro lead">
+          Every year, Route to Success runs a Math Competition for students. Competitors solve problems across three
+          rounds, grouped into divisions by grade.
+        </p>
+      )
+    }
+
+    {
+      last && (
+        <section id="results" aria-labelledby="results-heading">
+          <h2 id="results-heading">{last.year} Results</h2>
+          <CompetitionResults competition={last} />
+          <div class="photos-soon">
+            <ComingSoon text={`Photos from the ${last.year} Math Competition are coming soon.`} />
+          </div>
+        </section>
+      )
+    }
 
     <!-- The footer links to each of these sections by its id. -->
-    <section id="register">
-      <h2>Register</h2>
-      {
-        current?.registration ? (
-          <div class="card register">
-            {current.stage === 'upcoming' && <p>{registrationOpensText(current.registration)}</p>}
-            {current.stage === 'registration-open' && (
-              <p>{registrationOpenText(current.registration)}</p>
-            )}
-            {current.stage === 'registration-closed' && (
-              <p>
-                Online registration is closed.
-                {current.walkIns && current.date && ` Walk-ins are welcome on ${formatDate(current.date)}.`}
-              </p>
-            )}
-            {current.entryFee !== undefined && <p>Entry Fee: ${current.entryFee} per Competitor.</p>}
-            {beneficiaryText && <p>Entry Fees support {beneficiaryText}.</p>}
-            {(current.stage === 'upcoming' || current.stage === 'registration-open') &&
-              (current.registration.formUrl ? (
-                <a class="button" href={current.registration.formUrl}>
-                  Register now <span aria-hidden="true">→</span>
-                </a>
-              ) : (
-                <p class="link-soon">Registration link coming soon</p>
-              ))}
-          </div>
-        ) : (
-          <ComingSoon text="Registration details are coming soon." />
-        )
-      }
-    </section>
+    {/* Between Math Competitions there's nothing to register for, so the section is left out until the next one is added. */}
+    {
+      !last && (
+        <section id="register">
+          <h2>Register</h2>
+          {
+            current?.registration ? (
+              <div class="card register">
+                {current.stage === 'upcoming' && <p>{registrationOpensText(current.registration)}</p>}
+                {current.stage === 'registration-open' && (
+                  <p>{registrationOpenText(current.registration)}</p>
+                )}
+                {current.stage === 'registration-closed' && (
+                  <p>
+                    Online registration is closed.
+                    {current.walkIns && current.date && ` Walk-ins are welcome on ${formatDate(current.date)}.`}
+                  </p>
+                )}
+                {current.entryFee !== undefined && <p>Entry fee: ${current.entryFee} per competitor.</p>}
+                {beneficiaryText && <p>Entry fees support {beneficiaryText}.</p>}
+                {(current.stage === 'upcoming' || current.stage === 'registration-open') &&
+                  (current.registration.formUrl ? (
+                    <a class="button" href={current.registration.formUrl}>
+                      Register now <span aria-hidden="true">→</span>
+                    </a>
+                  ) : (
+                    <p class="link-soon">Registration link coming soon</p>
+                  ))}
+              </div>
+            ) : (
+              <ComingSoon text="Registration details are coming soon." />
+            )
+          }
+        </section>
+      )
+    }
 
     <section id="rounds-and-divisions">
       <h2>Rounds &amp; Divisions</h2>
       <div class="facts">
         <div class="card">
-          <h3>Three Rounds</h3>
-          <p>Every Competitor takes part in Sprint and Target. Only the top Competitors move on to Countdown.</p>
-          <ul class="round-list">
-            {
-              rounds.map((round) => (
-                <li>
-                  <span class="round-name">{round.name}</span>
-                  <span>{round.about}</span>
-                </li>
-              ))
-            }
-          </ul>
-        </div>
-        <div class="card">
-          <h3>{countWord(divisions.length)} Divisions</h3>
+          <h3>{divisions.length > 0 ? `${countWord(divisions.length)} Divisions` : 'Divisions'}</h3>
           <p>
             Competitors are grouped by grade, so everyone competes against students of a similar age.
             {current?.grades && ` This year is open to ${current.grades.toLowerCase()}.`}
@@ -256,6 +287,20 @@ const mapUrl = current?.location
                 <li>
                   {division.name}
                   {division.grades && <span class="chip-detail"> · {division.grades}</span>}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Three Rounds</h3>
+          <p>Every competitor takes part in Sprint and Target. Only the top competitors move on to Countdown.</p>
+          <ul class="round-list">
+            {
+              rounds.map((round) => (
+                <li>
+                  <span class="round-name">{round.name}</span>
+                  <span>{round.about}</span>
                 </li>
               ))
             }
@@ -279,11 +324,11 @@ const mapUrl = current?.location
       <p class="faq-intro">
         Have another question? Email us at <a href="mailto:bc.routetosuccess@gmail.com">bc.routetosuccess@gmail.com</a>.
       </p>
-      <div class="faq-list">
+      <div class="card faq-list">
         {
           faqs.map((faq) => (
-            <details class="card faq-item">
-              <summary>{faq.q}</summary>
+            <div class="faq-item">
+              <h3>{faq.q}</h3>
               <ul>
                 {faq.a.map((point) =>
                   typeof point === 'string' ? (
@@ -305,7 +350,7 @@ const mapUrl = current?.location
                   </li>
                 )}
               </ul>
-            </details>
+            </div>
           ))
         }
       </div>
@@ -320,6 +365,14 @@ const mapUrl = current?.location
 </BaseLayout>
 
 <style>
+  #results {
+    scroll-margin-top: 7rem;
+  }
+
+  .photos-soon {
+    margin-top: 1.5rem;
+  }
+
   .competition-hero {
     position: relative;
     background: var(--club-blue-soft);
@@ -456,15 +509,10 @@ const mapUrl = current?.location
     font-weight: 600;
   }
 
+  /* Divisions first, with Rounds underneath. */
   .facts {
     display: grid;
     gap: 1.5rem;
-  }
-
-  @media (min-width: 44rem) {
-    .facts {
-      grid-template-columns: 1fr 1fr;
-    }
   }
 
   .facts h3 {
@@ -492,20 +540,23 @@ const mapUrl = current?.location
     margin: 0 0 1rem;
   }
 
+  /* Every question in one card, split by the site's dashed blue lines. */
   .faq-list {
-    display: grid;
-    gap: 0.75rem;
+    padding: 0.5rem 1.5rem;
+    box-shadow: none;
   }
 
-  /* Squarer than the other cards, with less padding. */
   .faq-item {
-    border-radius: 0.5rem;
-    padding: 1.1rem 1.5rem;
+    padding-block: 1.1rem;
   }
 
-  .faq-item summary {
-    cursor: pointer;
-    font-weight: 700;
+  .faq-item + .faq-item {
+    border-top: 2px dashed var(--club-blue);
+  }
+
+  .faq-item h3 {
+    margin: 0;
+    font-size: 1.125rem;
   }
 
   .faq-item ul {

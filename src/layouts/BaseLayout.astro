@@ -2,6 +2,7 @@
 import { Font } from 'astro:assets';
 import Sparkle from '../components/Sparkle.astro';
 import { getEvents, smallerEventsId } from '../lib/events';
+import { getCurrentCompetition, getShownCompetition } from '../lib/competitions';
 
 interface Props {
   title: string;
@@ -30,11 +31,20 @@ const nav: NavItem[] = [
   { href: '/contact', label: 'Contact' },
 ];
 
+// Between Math Competitions there's nothing to register for, so the footer links to the last one's results instead.
+const current = await getCurrentCompetition();
+const shown = await getShownCompetition();
+const firstCompetitionLink = current
+  ? [{ href: '/math-competition#register', label: 'Register' }]
+  : shown
+    ? [{ href: '/math-competition#results', label: `${shown.year} Results` }]
+    : [];
+
 const footer = [
   {
     heading: 'Math Competition',
     links: [
-      { href: '/math-competition#register', label: 'Register' },
+      ...firstCompetitionLink,
       { href: '/math-competition#rounds-and-divisions', label: 'Rounds & Divisions' },
       { href: '/math-competition#sample-questions', label: 'Sample Questions' },
       { href: '/math-competition#faq', label: 'FAQ' },
